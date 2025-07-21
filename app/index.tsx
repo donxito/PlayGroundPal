@@ -11,7 +11,13 @@ export default function Index() {
         backgroundColor: "white",
       }}
     >
-      <Text style={{ color: "black", fontSize: 24 }}>HELLO WORLD </Text>
+      <Text style={{ color: "black", fontSize: 24 }}>PlaygroundPal </Text>
+
+      <Text
+        style={{ color: "red", fontSize: 14, marginBottom: 20, marginTop: 16 }}
+      >
+        Para o menino Theo{" "}
+      </Text>
 
       {/* testing */}
       <TestComponent />
