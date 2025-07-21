@@ -1,12 +1,17 @@
 import React from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import { usePlaygroundStore } from "../store/playgroundStore";
+import { Button } from "../components/ui/Button";
 
 /**
  * Test component to verify all dependencies are working correctly
  */
 export const TestComponent: React.FC = () => {
   const { playgrounds, loading } = usePlaygroundStore();
+
+  const handlePress = () => {
+    console.log("Button pressed");
+  };
 
   return (
     <View className="flex-1 justify-center items-center bg-background p-4">
@@ -37,13 +42,18 @@ export const TestComponent: React.FC = () => {
           TypeScript Types: ✅ Working
         </Text>
       </View>
+      <View className="bg-accent p-4 rounded-lg mb-4">
+        <TouchableOpacity
+          className="bg-gray-800 px-6 py-3 rounded-lg mt-10"
+          onPress={() => console.log("Dependencies configured successfully!")}
+        >
+          <Text className="text-white font-semibold">Test Complete</Text>
+        </TouchableOpacity>
 
-      <TouchableOpacity
-        className="bg-gray-800 px-6 py-3 rounded-lg"
-        onPress={() => console.log("Dependencies configured successfully!")}
-      >
-        <Text className="text-white font-semibold">Test Complete</Text>
-      </TouchableOpacity>
+        <Button onPress={handlePress} className="mt-2">
+          Press Me
+        </Button>
+      </View>
     </View>
   );
 };
