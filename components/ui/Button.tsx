@@ -3,7 +3,8 @@ import { TouchableOpacity, Text, ActivityIndicator } from "react-native";
 
 interface ButtonProps {
   onPress: () => void;
-  title: string;
+  title?: string;
+  children?: React.ReactNode;
   variant?: "primary" | "secondary" | "outline" | "danger";
   size?: "sm" | "md" | "lg";
   disabled?: boolean;
@@ -18,7 +19,8 @@ interface ButtonProps {
  * Button component with NativeWind styling
  *
  * @param onPress Function to call when button is pressed
- * @param title Text to display in the button
+ * @param title Text to display in the button (alternative to children)
+ * @param children React children to display in the button (alternative to title)
  * @param variant Visual style variant (primary, secondary, outline, danger)
  * @param size Size of the button (sm, md, lg)
  * @param disabled Whether the button is disabled
@@ -31,6 +33,7 @@ interface ButtonProps {
 export const Button: React.FC<ButtonProps> = ({
   onPress,
   title,
+  children,
   variant = "primary",
   size = "md",
   disabled = false,
@@ -85,7 +88,11 @@ export const Button: React.FC<ButtonProps> = ({
       onPress={onPress}
       disabled={disabled || loading}
       className={buttonClasses}
-      accessibilityLabel={accessibilityLabel || title}
+      accessibilityLabel={
+        accessibilityLabel ||
+        title ||
+        (typeof children === "string" ? children : "Button")
+      }
       accessibilityRole="button"
       accessibilityState={{ disabled, busy: loading }}
       testID={testID}
@@ -97,7 +104,7 @@ export const Button: React.FC<ButtonProps> = ({
           className="mr-2"
         />
       ) : null}
-      <Text className={textClasses}>{title}</Text>
+      <Text className={textClasses}>{children || title}</Text>
     </TouchableOpacity>
   );
 };
