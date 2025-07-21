@@ -1,6 +1,6 @@
 module.exports = {
   preset: "ts-jest",
-  testEnvironment: "node",
+  testEnvironment: "jsdom",
   roots: ["<rootDir>"],
   testMatch: ["**/__tests__/**/*.test.ts", "**/?(*.)+(spec|test).ts"],
   transform: {
@@ -14,4 +14,5 @@ module.exports = {
   ],
   coverageDirectory: "coverage",
   coverageReporters: ["text", "lcov", "html"],
+  transformIgnorePatterns: ["/node_modules/(?!nanoid).+\\.js$"],
 };
