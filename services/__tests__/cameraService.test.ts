@@ -73,6 +73,11 @@ describe("Camera Service", () => {
   // Reset all mocks before each test
   beforeEach(() => {
     jest.clearAllMocks();
+    jest.spyOn(console, "error").mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   describe("requestCameraPermissions", () => {
@@ -784,9 +789,9 @@ describe("Camera Service", () => {
 
       // Mock directory listing with MAX_PHOTOS files
       (FileSystem.readDirectoryAsync as jest.Mock).mockResolvedValue(
-        Array(VALIDATION_RULES.MAX_PHOTOS).fill(0).map((_, i) => 
-          `playground_playground-1_${i}.jpg`
-        )
+        Array(VALIDATION_RULES.MAX_PHOTOS)
+          .fill(0)
+          .map((_, i) => `playground_playground-1_${i}.jpg`)
       );
 
       const result = await hasReachedPhotoLimit("playground-1");
@@ -802,9 +807,9 @@ describe("Camera Service", () => {
 
       // Mock directory listing with fewer than MAX_PHOTOS files
       (FileSystem.readDirectoryAsync as jest.Mock).mockResolvedValue(
-        Array(VALIDATION_RULES.MAX_PHOTOS - 1).fill(0).map((_, i) => 
-          `playground_playground-1_${i}.jpg`
-        )
+        Array(VALIDATION_RULES.MAX_PHOTOS - 1)
+          .fill(0)
+          .map((_, i) => `playground_playground-1_${i}.jpg`)
       );
 
       const result = await hasReachedPhotoLimit("playground-1");
@@ -814,7 +819,9 @@ describe("Camera Service", () => {
 
     it("should handle errors gracefully", async () => {
       // Mock directory checks to throw an error
-      (FileSystem.getInfoAsync as jest.Mock).mockRejectedValue(new Error("Error"));
+      (FileSystem.getInfoAsync as jest.Mock).mockRejectedValue(
+        new Error("Error")
+      );
 
       // Should not throw and return false
       const result = await hasReachedPhotoLimit("playground-1");

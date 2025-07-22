@@ -1,16 +1,21 @@
 import { jest } from "@jest/globals";
 import "react-native-gesture-handler/jestSetup";
 
-jest.mock("expo-constants", () => ({
-  ...jest.requireActual("expo-constants"),
-  manifest: {
-    ...jest.requireActual("expo-constants").manifest,
-    extra: {
-      ...jest.requireActual("expo-constants").manifest.extra,
-      storybookEnabled: process.env.STORYBOOK_ENABLED,
+jest.mock("expo-constants", () => {
+  const ActualConstants = jest.requireActual("expo-constants").default;
+  return {
+    default: {
+      ...ActualConstants,
+      expoConfig: {
+        ...ActualConstants.expoConfig,
+        extra: {
+          ...ActualConstants.expoConfig?.extra,
+          storybookEnabled: process.env.STORYBOOK_ENABLED,
+        },
+      },
     },
-  },
-}));
+  };
+});
 
 jest.mock("expo-router", () => {
   const router = jest.requireActual("expo-router");

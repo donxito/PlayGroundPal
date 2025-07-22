@@ -1,8 +1,9 @@
 import React from "react";
-import { render, fireEvent } from "@testing-library/react-native";
+import { render, fireEvent, waitFor } from "@testing-library/react-native";
 import { PlaygroundCard } from "../PlaygroundCard";
 import { router } from "expo-router";
 import { usePlaygroundStore } from "../../../store/playgroundStore";
+import { act } from "react-test-renderer";
 
 // Mock dependencies
 jest.mock("expo-router", () => ({
@@ -33,22 +34,22 @@ const mockPlayground = {
   dateModified: new Date("2023-01-15"),
 };
 
-const mockPlaygroundNoPhotos = {
-  ...mockPlayground,
-  id: "playground-2",
-  photos: [],
-};
+// const mockPlaygroundNoPhotos = {
+//   ...mockPlayground,
+//   id: "playground-2",
+//   photos: [],
+// };
 
-const mockPlaygroundNoAddress = {
-  ...mockPlayground,
-  id: "playground-3",
-  location: {
-    coordinates: {
-      latitude: 40.7812,
-      longitude: -73.9665,
-    },
-  },
-};
+// const mockPlaygroundNoAddress = {
+//   ...mockPlayground,
+//   id: "playground-3",
+//   location: {
+//     coordinates: {
+//       latitude: 40.7812,
+//       longitude: -73.9665,
+//     },
+//   },
+// };
 
 describe("PlaygroundCard", () => {
   beforeEach(() => {
@@ -81,18 +82,25 @@ describe("PlaygroundCard", () => {
     );
   });
 
-  it("calls deletePlayground when delete is confirmed", () => {
+  it("calls deletePlayground when delete is confirmed", async () => {
     const { getByTestId } = render(
       <PlaygroundCard playground={mockPlayground} />
     );
 
     // Find the delete action by testID and press it
     const deleteAction = getByTestId("playground-delete-action");
-    fireEvent.press(deleteAction);
+    await act(async () => {
+      fireEvent.press(deleteAction);
+    });
 
     // Find the confirm button by testID and press it
     const confirmButton = getByTestId("playground-delete-modal-confirm");
-    fireEvent.press(confirmButton);
+    await act(async () => {
+      fireEvent.press(confirmButton);
+    });
+    await waitFor(() =>
+      expect(usePlaygroundStore().deletePlayground).toHaveBeenCalled()
+    );
 
     // Check if deletePlayground was called with the correct ID
     expect(usePlaygroundStore().deletePlayground).toHaveBeenCalledWith(

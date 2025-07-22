@@ -14,7 +14,7 @@ import {
   backupPlaygrounds,
   restorePlaygrounds,
 } from "../storageService";
-import { Playground, StoredData, AppError } from "../../types/playground";
+import { Playground, StoredData } from "../../types/playground";
 
 // Mock AsyncStorage
 jest.mock("@react-native-async-storage/async-storage", () => ({
@@ -95,6 +95,11 @@ describe("Storage Service", () => {
   beforeEach(() => {
     // Clear all mocks before each test
     jest.clearAllMocks();
+    jest.spyOn(console, "error").mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   describe("savePlaygrounds", () => {

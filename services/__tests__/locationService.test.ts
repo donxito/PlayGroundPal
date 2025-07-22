@@ -8,7 +8,6 @@
  * - Distance calculations
  * - Error handling
  *
- * Requirements: 3.1, 3.2, 3.3, 3.5, 7.5
  */
 
 import * as Location from "expo-location";
@@ -46,6 +45,12 @@ describe("Location Service", () => {
   // Reset all mocks before each test
   beforeEach(() => {
     jest.clearAllMocks();
+    jest.spyOn(console, "error").mockImplementation(() => {});
+    jest.spyOn(console, "warn").mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   describe("requestLocationPermissions", () => {

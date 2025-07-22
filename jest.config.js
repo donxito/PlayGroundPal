@@ -1,6 +1,5 @@
 module.exports = {
-  preset: "ts-jest",
-  testEnvironment: "jsdom",
+  preset: "jest-expo",
   roots: ["<rootDir>"],
   testMatch: [
     "**/__tests__/**/*.test.ts",
@@ -8,16 +7,7 @@ module.exports = {
     "**/?(*.)+(spec|test).ts",
     "**/?(*.)+(spec|test).tsx",
   ],
-  transform: {
-    "^.+\\.(ts|tsx)$": [
-      "ts-jest",
-      {
-        tsconfig: {
-          jsx: "react-jsx",
-        },
-      },
-    ],
-  },
+  testEnvironment: "node",
   collectCoverageFrom: [
     "types/**/*.ts",
     "store/**/*.ts",
@@ -28,8 +18,10 @@ module.exports = {
   ],
   coverageDirectory: "coverage",
   coverageReporters: ["text", "lcov", "html"],
-  transformIgnorePatterns: ["/node_modules/(?!nanoid).+\\.js$"],
   moduleNameMapper: {
-    "^react-native$": "react-native-web",
+    "^react-native$": "react-native",
+    "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$":
+      "<rootDir>/__mocks__/fileMock.js",
   },
+  setupFilesAfterEnv: ["<rootDir>/jest.setup.js"],
 };

@@ -7,6 +7,7 @@ import {
   geocodeAddress,
   checkLocationAvailability,
 } from "../../../services/locationService";
+import { act } from "react-test-renderer";
 
 // Mock dependencies
 jest.mock("../../../services/locationService", () => ({
@@ -34,7 +35,7 @@ describe("PlaygroundForm", () => {
     jest.clearAllMocks();
   });
 
-  it("renders correctly with empty initial data", () => {
+  it("renders correctly with empty initial data", async () => {
     const { getByTestId, getByText } = render(
       <PlaygroundForm
         onSubmit={mockOnSubmit}
@@ -48,7 +49,7 @@ describe("PlaygroundForm", () => {
     expect(getByTestId("test-form-rating")).toBeTruthy();
     expect(getByTestId("test-form-notes")).toBeTruthy();
     expect(getByTestId("test-form-photos")).toBeTruthy();
-    expect(getByText("Add Playground")).toBeTruthy();
+    await waitFor(() => getByText("Add Playground"));
   });
 
   it("renders correctly with initial data in edit mode", () => {
@@ -121,7 +122,9 @@ describe("PlaygroundForm", () => {
     fireEvent.changeText(getByTestId("test-form-notes"), "Test notes");
 
     // Submit form
-    fireEvent.press(getByTestId("test-form-submit"));
+    await act(async () => {
+      fireEvent.press(getByTestId("test-form-submit"));
+    });
 
     // Wait for submission to complete
     await waitFor(() => {
@@ -198,7 +201,9 @@ describe("PlaygroundForm", () => {
     );
 
     // Press get location button
-    fireEvent.press(getByTestId("test-form-get-location"));
+    await act(async () => {
+      fireEvent.press(getByTestId("test-form-get-location"));
+    });
 
     // Wait for location to be retrieved
     await waitFor(() => {
@@ -227,7 +232,9 @@ describe("PlaygroundForm", () => {
     );
 
     // Press get location button
-    fireEvent.press(getByTestId("test-form-get-location"));
+    await act(async () => {
+      fireEvent.press(getByTestId("test-form-get-location"));
+    });
 
     // Wait for alert to be shown
     await waitFor(() => {

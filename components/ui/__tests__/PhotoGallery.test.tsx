@@ -1,6 +1,8 @@
-import React from "react";
-import { PhotoGallery } from "../PhotoGallery";
 import { PhotoData } from "../../../types/playground";
+import { render, waitFor } from "@testing-library/react-native";
+import PhotoGallery from "../PhotoGallery";
+import { Alert, Dimensions } from "react-native";
+import * as CameraService from "../../../services/cameraService";
 
 // Mock the camera service
 jest.mock("../../../services/cameraService", () => ({
@@ -19,16 +21,11 @@ jest.mock("expo-image", () => ({
   }),
 }));
 
-// Mock react-native Alert
-jest.mock("react-native", () => ({
-  ...jest.requireActual("react-native"),
-  Alert: {
-    alert: jest.fn(),
-  },
-  Dimensions: {
-    get: jest.fn(() => ({ width: 375, height: 812 })),
-  },
-}));
+// Add spies instead
+jest.spyOn(Alert, "alert").mockImplementation(jest.fn());
+jest
+  .spyOn(Dimensions, "get")
+  .mockReturnValue({ width: 375, height: 812, scale: 2, fontScale: 1 });
 
 describe("PhotoGallery", () => {
   const mockOnPhotosChange = jest.fn();
@@ -52,6 +49,11 @@ describe("PhotoGallery", () => {
   beforeEach(() => {
     mockOnPhotosChange.mockClear();
     jest.clearAllMocks();
+    jest.spyOn(console, "error").mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   describe("Component Props and Interface", () => {
@@ -390,6 +392,23 @@ describe("PhotoGallery", () => {
 
       expect(editableProps.editable).toBe(true);
       expect(readonlyProps.editable).toBe(false);
+    });
+  });
+
+  describe("Component Mounting", () => {
+    it("renders without crashing", async () => {
+      (CameraService.getPlaygroundPhotos as jest.Mock).mockResolvedValue([]);
+      const { getByText } = render(
+        <PhotoGallery
+          playgroundId="test"
+          photos={[]}
+          onPhotosChange={() => {}}
+          testID="photo-gallery"
+        />
+      );
+      await waitFor(() =>
+        expect(getByText("No photos added yet")).toBeTruthy()
+      );
     });
   });
 });
