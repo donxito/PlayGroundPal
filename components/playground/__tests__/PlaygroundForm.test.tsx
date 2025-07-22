@@ -1,99 +1,241 @@
 import React from "react";
-import { render } from "@testing-library/react-native";
-import { Alert } from "react-native";
+import { render, fireEvent, waitFor } from "@testing-library/react-native";
 import { PlaygroundForm } from "../PlaygroundForm";
-import { usePlaygroundStore } from "../../../store/playgroundStore";
-//import * as locationService from "../../../services/locationService";
+import { Alert } from "react-native";
+import {
+  getCurrentLocation,
+  geocodeAddress,
+  checkLocationAvailability,
+} from "../../../services/locationService";
 
-// Mock expo modules
-jest.mock("expo-modules-core", () => ({
-  createPermissionHook: jest.fn(),
-}));
-
-jest.mock("expo-image", () => ({
-  Image: "Image",
-}));
-
-jest.mock("expo-camera", () => ({
-  getCameraPermissionsAsync: jest.fn(),
-  requestCameraPermissionsAsync: jest.fn(),
-}));
-
-jest.mock("expo-image-picker", () => ({
-  getMediaLibraryPermissionsAsync: jest.fn(),
-  requestMediaLibraryPermissionsAsync: jest.fn(),
-  launchImageLibraryAsync: jest.fn(),
-}));
-
-// Mock the store
-jest.mock("../../../store/playgroundStore", () => ({
-  usePlaygroundStore: jest.fn(),
-}));
-
-// Mock location service
+// Mock dependencies
 jest.mock("../../../services/locationService", () => ({
   getCurrentLocation: jest.fn(),
   geocodeAddress: jest.fn(),
+  checkLocationAvailability: jest.fn(),
+  formatDistance: jest.fn(),
 }));
 
-// Mock camera service
 jest.mock("../../../services/cameraService", () => ({
-  takePicture: jest.fn(),
-  pickImage: jest.fn(),
+  takePhoto: jest.fn(),
+  selectPhoto: jest.fn(),
+  getPlaygroundPhotos: jest.fn().mockResolvedValue([]),
+  hasReachedPhotoLimit: jest.fn().mockResolvedValue(false),
 }));
 
 // Mock Alert
 jest.spyOn(Alert, "alert").mockImplementation(() => {});
 
 describe("PlaygroundForm", () => {
-  // Setup mock store before each test
-  beforeEach(() => {
-    (usePlaygroundStore as jest.Mock).mockReturnValue({
-      addPlayground: jest.fn().mockResolvedValue(undefined),
-      updatePlayground: jest.fn().mockResolvedValue(undefined),
-      error: null,
-      clearError: jest.fn(),
-    });
-  });
+  const mockOnSubmit = jest.fn().mockResolvedValue(undefined);
+  const mockOnCancel = jest.fn();
 
-  afterEach(() => {
+  beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it("renders without crashing", () => {
-    const { toJSON } = render(<PlaygroundForm />);
-    expect(toJSON()).toBeTruthy();
+  it("renders correctly with empty initial data", () => {
+    const { getByTestId, getByText } = render(
+      <PlaygroundForm
+        onSubmit={mockOnSubmit}
+        onCancel={mockOnCancel}
+        testID="test-form"
+      />
+    );
+
+    expect(getByTestId("test-form-name")).toBeTruthy();
+    expect(getByTestId("test-form-location")).toBeTruthy();
+    expect(getByTestId("test-form-rating")).toBeTruthy();
+    expect(getByTestId("test-form-notes")).toBeTruthy();
+    expect(getByTestId("test-form-photos")).toBeTruthy();
+    expect(getByText("Add Playground")).toBeTruthy();
   });
 
-  it("renders in edit mode without crashing", () => {
+  it("renders correctly with initial data in edit mode", () => {
     const initialData = {
-      id: "123",
       name: "Test Playground",
-      location: { address: "123 Main St" },
+      location: { address: "123 Test St" },
       rating: 4,
       notes: "Test notes",
       photos: [],
     };
 
-    const { toJSON } = render(
-      <PlaygroundForm initialData={initialData} isEdit={true} />
+    const { getByTestId, getByText } = render(
+      <PlaygroundForm
+        initialData={initialData}
+        playgroundId="test-id"
+        onSubmit={mockOnSubmit}
+        onCancel={mockOnCancel}
+        isEditing={true}
+        testID="test-form"
+      />
     );
-    expect(toJSON()).toBeTruthy();
+
+    expect(getByTestId("test-form-name").props.value).toBe("Test Playground");
+    expect(getByTestId("test-form-location").props.value).toBe("123 Test St");
+    expect(getByTestId("test-form-notes").props.value).toBe("Test notes");
+    expect(getByText("Save Changes")).toBeTruthy();
   });
 
-  it("calls onSubmit callback when provided", () => {
-    const mockOnSubmit = jest.fn();
-    const { toJSON } = render(<PlaygroundForm onSubmit={mockOnSubmit} />);
-    expect(toJSON()).toBeTruthy();
-    // We can't easily test the onSubmit callback without UI interaction,
-    // but we can verify that the component renders with the callback
+  it("validates required fields on submit", async () => {
+    const { getByTestId, getByText, queryByText } = render(
+      <PlaygroundForm
+        onSubmit={mockOnSubmit}
+        onCancel={mockOnCancel}
+        testID="test-form"
+      />
+    );
+
+    // Submit with empty form
+    fireEvent.press(getByTestId("test-form-submit"));
+
+    // Wait for validation to complete
+    await waitFor(() => {
+      expect(Alert.alert).toHaveBeenCalledWith(
+        "Validation Error",
+        "Please fix the errors in the form before submitting.",
+        [{ text: "OK" }]
+      );
+    });
+
+    // Check that onSubmit was not called
+    expect(mockOnSubmit).not.toHaveBeenCalled();
   });
 
-  it("calls onCancel callback when provided", () => {
-    const mockOnCancel = jest.fn();
-    const { toJSON } = render(<PlaygroundForm onCancel={mockOnCancel} />);
-    expect(toJSON()).toBeTruthy();
-    // We can't easily test the onCancel callback without UI interaction,
-    // but we can verify that the component renders with the callback
+  it("submits form with valid data", async () => {
+    const { getByTestId } = render(
+      <PlaygroundForm
+        onSubmit={mockOnSubmit}
+        onCancel={mockOnCancel}
+        testID="test-form"
+      />
+    );
+
+    // Fill out form
+    fireEvent.changeText(getByTestId("test-form-name"), "Test Playground");
+    fireEvent.changeText(getByTestId("test-form-location"), "123 Test St");
+
+    // Set rating
+    fireEvent.press(getByTestId("test-form-rating-star-4"));
+
+    fireEvent.changeText(getByTestId("test-form-notes"), "Test notes");
+
+    // Submit form
+    fireEvent.press(getByTestId("test-form-submit"));
+
+    // Wait for submission to complete
+    await waitFor(() => {
+      expect(mockOnSubmit).toHaveBeenCalledWith({
+        name: "Test Playground",
+        location: { address: "123 Test St" },
+        rating: 4,
+        notes: "Test notes",
+        photos: [],
+      });
+    });
+  });
+
+  it("resets form when reset button is pressed", () => {
+    const { getByTestId } = render(
+      <PlaygroundForm
+        onSubmit={mockOnSubmit}
+        onCancel={mockOnCancel}
+        testID="test-form"
+      />
+    );
+
+    // Fill out form
+    fireEvent.changeText(getByTestId("test-form-name"), "Test Playground");
+    fireEvent.changeText(getByTestId("test-form-location"), "123 Test St");
+
+    // Reset form
+    fireEvent.press(getByTestId("test-form-reset"));
+
+    // Check that form was reset
+    expect(getByTestId("test-form-name").props.value).toBe("");
+    expect(getByTestId("test-form-location").props.value).toBe("");
+  });
+
+  it("calls onCancel when cancel button is pressed", () => {
+    const { getByTestId } = render(
+      <PlaygroundForm
+        onSubmit={mockOnSubmit}
+        onCancel={mockOnCancel}
+        testID="test-form"
+      />
+    );
+
+    fireEvent.press(getByTestId("test-form-cancel"));
+    expect(mockOnCancel).toHaveBeenCalled();
+  });
+
+  it("gets current location when button is pressed", async () => {
+    // Mock successful location retrieval
+    const mockLocation = {
+      coordinates: {
+        latitude: 37.7749,
+        longitude: -122.4194,
+        accuracy: 10,
+      },
+      address: "123 Test St",
+      timestamp: new Date(),
+    };
+
+    (checkLocationAvailability as jest.Mock).mockResolvedValue({
+      servicesEnabled: true,
+      permissionGranted: true,
+      canRequestPermission: true,
+    });
+
+    (getCurrentLocation as jest.Mock).mockResolvedValue(mockLocation);
+
+    const { getByTestId } = render(
+      <PlaygroundForm
+        onSubmit={mockOnSubmit}
+        onCancel={mockOnCancel}
+        testID="test-form"
+      />
+    );
+
+    // Press get location button
+    fireEvent.press(getByTestId("test-form-get-location"));
+
+    // Wait for location to be retrieved
+    await waitFor(() => {
+      expect(checkLocationAvailability).toHaveBeenCalled();
+      expect(getCurrentLocation).toHaveBeenCalled();
+    });
+
+    // Check that location was updated in form
+    expect(getByTestId("test-form-location").props.value).toBe("123 Test St");
+  });
+
+  it("shows error when location services are disabled", async () => {
+    // Mock location services disabled
+    (checkLocationAvailability as jest.Mock).mockResolvedValue({
+      servicesEnabled: false,
+      permissionGranted: false,
+      canRequestPermission: false,
+    });
+
+    const { getByTestId } = render(
+      <PlaygroundForm
+        onSubmit={mockOnSubmit}
+        onCancel={mockOnCancel}
+        testID="test-form"
+      />
+    );
+
+    // Press get location button
+    fireEvent.press(getByTestId("test-form-get-location"));
+
+    // Wait for alert to be shown
+    await waitFor(() => {
+      expect(Alert.alert).toHaveBeenCalledWith(
+        "Location Services Disabled",
+        "Please enable location services in your device settings to use this feature.",
+        [{ text: "OK" }]
+      );
+    });
   });
 });
