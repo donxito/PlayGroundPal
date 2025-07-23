@@ -4,7 +4,6 @@ import {
   usePlaygroundStore,
   getSortedAndFilteredPlaygrounds,
 } from "../../store/playgroundStore";
-import PlaygroundListScreen from "../index";
 
 // Mock the store
 jest.mock("../../store/playgroundStore", () => ({
@@ -21,6 +20,7 @@ jest.mock("expo-router", () => ({
   router: {
     push: jest.fn(),
   },
+  Redirect: jest.fn(() => null),
 }));
 
 // Mock expo-location
@@ -38,6 +38,9 @@ jest.mock("expo-location", () => ({
 jest.mock("../../components/playground/SortFilterBar", () => ({
   SortFilterBar: () => null,
 }));
+
+// Import the actual component we want to test
+import PlaygroundListScreen from "../(tabs)/index";
 
 describe("PlaygroundListScreen", () => {
   // Sample playground data for testing
