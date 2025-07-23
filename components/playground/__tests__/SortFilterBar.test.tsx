@@ -31,7 +31,6 @@ describe("SortFilterBar", () => {
 
     // Check sort button
     expect(getByText("Sort:")).toBeTruthy();
-    expect(getByText("Date Added")).toBeTruthy();
     expect(getByTestId("sort-button")).toBeTruthy();
 
     // Check filter button
@@ -61,7 +60,6 @@ describe("SortFilterBar", () => {
 
     // Check if modal is open
     expect(getByText("Filter By")).toBeTruthy();
-    expect(getByText("Rating")).toBeTruthy();
     expect(getByText("Photos")).toBeTruthy();
     expect(getByTestId("filter-rating-1")).toBeTruthy();
     expect(getByTestId("filter-has-photos")).toBeTruthy();

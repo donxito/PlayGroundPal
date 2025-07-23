@@ -6,18 +6,10 @@ import { RatingSelector } from "../ui/RatingSelector";
 import { LoadingSpinner } from "../ui/LoadingSpinner";
 import { PhotoGallery } from "../ui/PhotoGallery";
 import { Modal } from "../ui/Modal";
-import {
-  Playground,
-  PlaygroundFormData,
-  ValidationError,
-  LocationData,
-  VALIDATION_RULES,
-} from "../../types/playground";
+import { PlaygroundFormData, VALIDATION_RULES } from "../../types/playground";
 import {
   getCurrentLocation,
-  geocodeAddress,
   checkLocationAvailability,
-  formatDistance,
 } from "../../services/locationService";
 
 interface PlaygroundFormProps {
@@ -28,6 +20,7 @@ interface PlaygroundFormProps {
   isEditing?: boolean;
   className?: string;
   testID?: string;
+  onChange?: () => void;
 }
 
 /**
@@ -49,6 +42,7 @@ export const PlaygroundForm: React.FC<PlaygroundFormProps> = ({
   isEditing = false,
   className = "",
   testID,
+  onChange,
 }) => {
   // Form state
   const [formData, setFormData] = useState<PlaygroundFormData>({
@@ -66,7 +60,6 @@ export const PlaygroundForm: React.FC<PlaygroundFormProps> = ({
   // Loading state
   const [loading, setLoading] = useState(false);
   const [locationLoading, setLocationLoading] = useState(false);
-  const [submitAttempted, setSubmitAttempted] = useState(false);
 
   // Location modal state
   const [locationModalVisible, setLocationModalVisible] = useState(false);
@@ -96,6 +89,11 @@ export const PlaygroundForm: React.FC<PlaygroundFormProps> = ({
         ...prev,
         [field]: "",
       }));
+    }
+
+    // Notify parent component of changes
+    if (onChange) {
+      onChange();
     }
   };
 
@@ -139,8 +137,6 @@ export const PlaygroundForm: React.FC<PlaygroundFormProps> = ({
    * Handle form submission
    */
   const handleSubmit = async () => {
-    setSubmitAttempted(true);
-
     // Validate form
     if (!validateForm()) {
       Alert.alert(
@@ -192,7 +188,6 @@ export const PlaygroundForm: React.FC<PlaygroundFormProps> = ({
     }
 
     setErrors({});
-    setSubmitAttempted(false);
   };
 
   /**
@@ -258,53 +253,6 @@ export const PlaygroundForm: React.FC<PlaygroundFormProps> = ({
         error instanceof Error
           ? error.message
           : "Failed to get current location. Please try again or enter address manually.",
-        [{ text: "OK" }]
-      );
-    } finally {
-      setLocationLoading(false);
-    }
-  };
-
-  /**
-   * Handle geocoding address to coordinates
-   */
-  const handleGeocodeAddress = async () => {
-    if (!formData.location.address || formData.location.address.trim() === "") {
-      setErrors((prev) => ({
-        ...prev,
-        location: "Please enter an address to geocode",
-      }));
-      return;
-    }
-
-    try {
-      setLocationLoading(true);
-
-      // Geocode address to coordinates
-      const locationData = await geocodeAddress(formData.location.address);
-
-      // Update form data with location
-      setFormData((prev) => ({
-        ...prev,
-        location: locationData,
-      }));
-
-      // Clear location error if it exists
-      if (errors.location) {
-        setErrors((prev) => ({
-          ...prev,
-          location: "",
-        }));
-      }
-    } catch (error) {
-      console.error("Error geocoding address:", error);
-
-      // Show error message
-      Alert.alert(
-        "Geocoding Error",
-        error instanceof Error
-          ? error.message
-          : "Failed to geocode address. Please check the address and try again.",
         [{ text: "OK" }]
       );
     } finally {

@@ -45,3 +45,88 @@ jest.mock("react-native-reanimated", () => {
   Reanimated.default.call = () => {};
   return Reanimated;
 });
+
+// Mock React Native manually to avoid TurboModule issues
+jest.mock("react-native", () => ({
+  View: "View",
+  Text: "Text",
+  ScrollView: "ScrollView",
+  TouchableOpacity: "TouchableOpacity",
+  TouchableWithoutFeedback: "TouchableWithoutFeedback",
+  TextInput: "TextInput",
+  Image: "Image",
+  FlatList: ({ data, renderItem, ListEmptyComponent, testID }) => {
+    const mockReact = require('react');
+    if (!data || data.length === 0) {
+      return ListEmptyComponent ? ListEmptyComponent() : null;
+    }
+    return mockReact.createElement('View', { testID }, 
+      data.map((item, index) => renderItem({ item, index }))
+    );
+  },
+  ActivityIndicator: "ActivityIndicator",
+  Modal: "Modal",
+  RefreshControl: "RefreshControl",
+  KeyboardAvoidingView: "KeyboardAvoidingView",
+  StyleSheet: {
+    create: jest.fn((styles) => styles),
+    flatten: jest.fn((styles) => styles),
+  },
+  Alert: {
+    alert: jest.fn(),
+  },
+  Dimensions: {
+    get: jest.fn(() => ({ width: 375, height: 812 })),
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+  },
+  Platform: {
+    OS: "ios",
+    select: jest.fn((obj) => obj.ios),
+  },
+  Pressable: "Pressable",
+  SafeAreaView: "SafeAreaView",
+  useColorScheme: jest.fn(() => "light"),
+}));
+
+// Mock expo-image
+jest.mock("expo-image", () => ({
+  Image: "Image",
+}));
+
+// Mock expo-status-bar
+jest.mock("expo-status-bar", () => ({
+  StatusBar: "StatusBar",
+}));
+
+// Mock expo-haptics
+jest.mock("expo-haptics", () => ({
+  impactAsync: jest.fn(),
+  notificationAsync: jest.fn(),
+  selectionAsync: jest.fn(),
+  ImpactFeedbackStyle: {
+    Light: "light",
+    Medium: "medium",
+    Heavy: "heavy",
+  },
+  NotificationFeedbackType: {
+    Success: "success",
+    Warning: "warning",
+    Error: "error",
+  },
+}));
+
+// Mock react-native-gesture-handler
+jest.mock("react-native-gesture-handler", () => ({
+  Swipeable: ({ children, renderRightActions, testID }) => {
+    const mockReact = require('react');
+    return mockReact.createElement('View', { testID }, [
+      children,
+      renderRightActions ? renderRightActions() : null
+    ]);
+  },
+  State: {},
+  PanGestureHandler: "PanGestureHandler",
+  TapGestureHandler: "TapGestureHandler",
+  gestureHandlerRootHOC: jest.fn((component) => component),
+}));
