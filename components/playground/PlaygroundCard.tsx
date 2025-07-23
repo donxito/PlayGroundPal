@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useRef, memo } from "react";
 import { View, Text, TouchableOpacity, Alert, Dimensions } from "react-native";
 import { Image } from "expo-image";
 import { router } from "expo-router";
-import { Swipeable } from "react-native-gesture-handler"; // TODO: FIX THIS
+import { Swipeable } from "react-native-gesture-handler";
+import * as Haptics from "expo-haptics";
 import { Playground } from "../../types/playground";
 import { usePlaygroundStore } from "../../store/playgroundStore";
 import { ConfirmModal } from "../ui/Modal";
@@ -19,7 +20,7 @@ interface PlaygroundCardProps {
  * @param playground The playground data to display
  * @param testID Test identifier for testing
  */
-export const PlaygroundCard: React.FC<PlaygroundCardProps> = ({
+const PlaygroundCardComponent: React.FC<PlaygroundCardProps> = ({
   playground,
   testID,
 }) => {
@@ -180,3 +181,5 @@ export const PlaygroundCard: React.FC<PlaygroundCardProps> = ({
     </>
   );
 };
+
+export const PlaygroundCard = memo(PlaygroundCardComponent);

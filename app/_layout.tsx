@@ -3,6 +3,7 @@ import { StatusBar } from "expo-status-bar";
 import { usePlaygroundStore } from "../store/playgroundStore";
 import { useEffect } from "react";
 import { Text, View } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 export default function RootLayout() {
   const { loadPlaygrounds, playgrounds, loading } = usePlaygroundStore();
@@ -14,7 +15,7 @@ export default function RootLayout() {
   console.log("playgrounds", playgrounds);
 
   return (
-    <>
+    <GestureHandlerRootView style={{ flex: 1 }}>
       <StatusBar style="auto" />
       <Stack screenOptions={{ headerShown: false }} />
       {loading && (
@@ -24,6 +25,6 @@ export default function RootLayout() {
           </View>
         </View>
       )}
-    </>
+    </GestureHandlerRootView>
   );
 }

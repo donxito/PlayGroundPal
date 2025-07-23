@@ -34,22 +34,22 @@ const mockPlayground = {
   dateModified: new Date("2023-01-15"),
 };
 
-// const mockPlaygroundNoPhotos = {
-//   ...mockPlayground,
-//   id: "playground-2",
-//   photos: [],
-// };
+const mockPlaygroundNoPhotos = {
+  ...mockPlayground,
+  id: "playground-2",
+  photos: [],
+};
 
-// const mockPlaygroundNoAddress = {
-//   ...mockPlayground,
-//   id: "playground-3",
-//   location: {
-//     coordinates: {
-//       latitude: 40.7812,
-//       longitude: -73.9665,
-//     },
-//   },
-// };
+const mockPlaygroundNoAddress = {
+  ...mockPlayground,
+  id: "playground-3",
+  location: {
+    coordinates: {
+      latitude: 40.7812,
+      longitude: -73.9665,
+    },
+  },
+};
 
 describe("PlaygroundCard", () => {
   beforeEach(() => {
@@ -115,5 +115,46 @@ describe("PlaygroundCard", () => {
 
     // Check if custom testID is applied
     expect(getByTestId("custom-test-id")).toBeTruthy();
+  });
+
+  it("displays placeholder when no photos are available", () => {
+    const { getByText } = render(
+      <PlaygroundCard playground={mockPlaygroundNoPhotos} />
+    );
+
+    // Check if the placeholder emoji is displayed
+    expect(getByText("🏞️")).toBeTruthy();
+  });
+
+  it("displays coordinates when no address is available", () => {
+    const { getByTestId } = render(
+      <PlaygroundCard playground={mockPlaygroundNoAddress} />
+    );
+
+    // Check if coordinates are displayed in the location text
+    const locationText = getByTestId("playground-location").props.children;
+    expect(locationText).toContain("40.7812");
+    expect(locationText).toContain("-73.9665");
+  });
+
+  it("cancels deletion when cancel button is pressed", async () => {
+    const { getByTestId } = render(
+      <PlaygroundCard playground={mockPlayground} />
+    );
+
+    // Find the delete action by testID and press it
+    const deleteAction = getByTestId("playground-delete-action");
+    await act(async () => {
+      fireEvent.press(deleteAction);
+    });
+
+    // Find the cancel button by testID and press it
+    const cancelButton = getByTestId("playground-delete-modal-cancel");
+    await act(async () => {
+      fireEvent.press(cancelButton);
+    });
+
+    // Check if deletePlayground was not called
+    expect(usePlaygroundStore().deletePlayground).not.toHaveBeenCalled();
   });
 });
