@@ -23,25 +23,6 @@ export function useNavigationGuard({
 }: NavigationGuardOptions) {
   const router = useRouter();
 
-  // Handle hardware back button on Android
-  useEffect(() => {
-    // Only add back handler if BackHandler is available (not in test environment)
-    if (BackHandler && BackHandler.addEventListener) {
-      const backHandler = BackHandler.addEventListener(
-        "hardwareBackPress",
-        () => {
-          if (hasUnsavedChanges) {
-            showUnsavedChangesAlert();
-            return true; // Prevent default back behavior
-          }
-          return false; // Allow default back behavior
-        }
-      );
-
-      return () => backHandler.remove();
-    }
-  }, [hasUnsavedChanges, showUnsavedChangesAlert]);
-
   // Show unsaved changes confirmation dialog
   const showUnsavedChangesAlert = useCallback(() => {
     Alert.alert("Unsaved Changes", message, [
@@ -60,6 +41,25 @@ export function useNavigationGuard({
       },
     ]);
   }, [message, onConfirmLeave, onCancelLeave, router]);
+
+  // Handle hardware back button on Android
+  useEffect(() => {
+    // Only add back handler if BackHandler is available (not in test environment)
+    if (BackHandler && BackHandler.addEventListener) {
+      const backHandler = BackHandler.addEventListener(
+        "hardwareBackPress",
+        () => {
+          if (hasUnsavedChanges) {
+            showUnsavedChangesAlert();
+            return true; // Prevent default back behavior
+          }
+          return false; // Allow default back behavior
+        }
+      );
+
+      return () => backHandler.remove();
+    }
+  }, [hasUnsavedChanges, showUnsavedChangesAlert]);
 
   // Guarded navigation function
   const guardedNavigate = useCallback(
