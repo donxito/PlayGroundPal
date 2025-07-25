@@ -6,6 +6,7 @@ import { PlaygroundForm } from "../../../components/playground/PlaygroundForm";
 import { usePlaygroundStore } from "../../../store/playgroundStore";
 import { PlaygroundFormData, Playground } from "../../../types/playground";
 import { LoadingSpinner } from "../../../components/ui/LoadingSpinner";
+import { useNavigationGuard } from "../../../hooks/useNavigationGuard";
 
 /**
  * Edit Playground Screen
@@ -26,6 +27,16 @@ export default function EditPlaygroundScreen() {
   const [playground, setPlayground] = useState<Playground | null>(null);
   const [loading, setLoading] = useState(true);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
+  // Navigation guard for unsaved changes
+  const { guardedNavigate } = useNavigationGuard({
+    hasUnsavedChanges,
+    message:
+      "You have unsaved changes. Are you sure you want to leave without saving?",
+    onConfirmLeave: () => {
+      setHasUnsavedChanges(false);
+    },
+  });
 
   // Find the playground by ID
   useEffect(() => {
@@ -90,26 +101,8 @@ export default function EditPlaygroundScreen() {
    */
   const handleCancel = () => {
     if (hasUnsavedChanges) {
-      // Confirm cancellation if form has been modified
-      Alert.alert(
-        "Unsaved Changes",
-        "You have unsaved changes. Are you sure you want to cancel?",
-        [
-          {
-            text: "No",
-            style: "cancel",
-          },
-          {
-            text: "Yes",
-            onPress: () => {
-              // Navigate back to detail view
-              router.push(`/playground/${playground?.id}`);
-            },
-          },
-        ]
-      );
+      guardedNavigate(`/playground/${playground?.id}`);
     } else {
-      // No unsaved changes, just go back
       router.push(`/playground/${playground?.id}`);
     }
   };

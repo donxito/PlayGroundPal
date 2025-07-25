@@ -10,6 +10,13 @@ import {
 import { act } from "react-test-renderer";
 
 // Mock dependencies
+jest.mock("expo-router", () => ({
+  useRouter: jest.fn(() => ({
+    push: jest.fn(),
+    back: jest.fn(),
+  })),
+}));
+
 jest.mock("../../../services/locationService", () => ({
   getCurrentLocation: jest.fn(),
   geocodeAddress: jest.fn(),
@@ -22,6 +29,11 @@ jest.mock("../../../services/cameraService", () => ({
   selectPhoto: jest.fn(),
   getPlaygroundPhotos: jest.fn().mockResolvedValue([]),
   hasReachedPhotoLimit: jest.fn().mockResolvedValue(false),
+}));
+
+// Mock BackHandler for navigation guard
+jest.mock("react-native/Libraries/Utilities/BackHandler", () => ({
+  addEventListener: jest.fn(() => ({ remove: jest.fn() })),
 }));
 
 // Mock Alert

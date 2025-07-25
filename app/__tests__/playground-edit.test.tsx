@@ -92,7 +92,7 @@ jest.mock("../../components/playground/PlaygroundForm", () => {
 
 // Access the mocked Alert from react-native
 import { Alert } from "react-native";
-const mockAlert = (Alert.alert as jest.Mock);
+const mockAlert = Alert.alert as jest.Mock;
 
 describe("EditPlaygroundScreen", () => {
   // Setup mocks
@@ -165,9 +165,12 @@ describe("EditPlaygroundScreen", () => {
     const component = render(<EditPlaygroundScreen />);
 
     // Wait for the component to fully render and useEffect to execute
-    await waitFor(() => {
-      expect(mockAlert).toHaveBeenCalled();
-    }, { timeout: 3000 });
+    await waitFor(
+      () => {
+        expect(mockAlert).toHaveBeenCalled();
+      },
+      { timeout: 3000 }
+    );
 
     // Check that router.back was called (which happens after Alert.alert's callback)
     expect(mockRouter.back).toHaveBeenCalled();
@@ -222,9 +225,12 @@ describe("EditPlaygroundScreen", () => {
     });
 
     // Wait for Alert to be called
-    await waitFor(() => {
-      expect(mockAlert).toHaveBeenCalled();
-    }, { timeout: 3000 });
+    await waitFor(
+      () => {
+        expect(mockAlert).toHaveBeenCalled();
+      },
+      { timeout: 3000 }
+    );
 
     expect(mockUpdatePlayground).toHaveBeenCalledWith(
       "test-id",
@@ -283,17 +289,23 @@ describe("EditPlaygroundScreen", () => {
     });
 
     // Wait for Alert to be called
-    await waitFor(() => {
-      expect(mockAlert).toHaveBeenCalled();
-    }, { timeout: 3000 });
+    await waitFor(
+      () => {
+        expect(mockAlert).toHaveBeenCalled();
+      },
+      { timeout: 3000 }
+    );
 
     // Verify Alert was called with correct arguments
     expect(mockAlert).toHaveBeenCalledWith(
       "Unsaved Changes",
-      "You have unsaved changes. Are you sure you want to cancel?",
+      "You have unsaved changes. Are you sure you want to leave without saving?",
       expect.arrayContaining([
-        expect.objectContaining({ text: "No", style: "cancel" }),
-        expect.objectContaining({ text: "Yes", onPress: expect.any(Function) }),
+        expect.objectContaining({ text: "Cancel", style: "cancel" }),
+        expect.objectContaining({
+          text: "Leave",
+          onPress: expect.any(Function),
+        }),
       ])
     );
 

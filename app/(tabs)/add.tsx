@@ -5,6 +5,7 @@ import { useRouter } from "expo-router";
 import { PlaygroundForm } from "../../components/playground/PlaygroundForm";
 import { usePlaygroundStore } from "../../store/playgroundStore";
 import { PlaygroundFormData } from "../../types/playground";
+import { useNavigationGuard } from "../../hooks/useNavigationGuard";
 
 // Export alert functions for testing
 export const showSuccessAlert = (message: string, onOk: () => void) => {
@@ -51,6 +52,17 @@ export default function AddPlaygroundScreen() {
   const router = useRouter();
   const { addPlayground } = usePlaygroundStore();
   const [submitting, setSubmitting] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
+  // Navigation guard for unsaved changes
+  const { guardedNavigate } = useNavigationGuard({
+    hasUnsavedChanges,
+    message:
+      "You have unsaved changes. Are you sure you want to leave without saving?",
+    onConfirmLeave: () => {
+      setHasUnsavedChanges(false);
+    },
+  });
 
   /**
    * Handle form submission
@@ -83,11 +95,18 @@ export default function AddPlaygroundScreen() {
    * Handle form cancellation
    */
   const handleCancel = () => {
-    // Confirm cancellation if form has been modified
-    showCancelConfirmation(() => {
-      // Navigate back to list
+    if (hasUnsavedChanges) {
+      guardedNavigate("/(tabs)");
+    } else {
       router.push("/(tabs)");
-    });
+    }
+  };
+
+  /**
+   * Handle form changes to track unsaved changes
+   */
+  const handleFormChange = () => {
+    setHasUnsavedChanges(true);
   };
 
   return (
@@ -109,6 +128,7 @@ export default function AddPlaygroundScreen() {
         <PlaygroundForm
           onSubmit={handleSubmit}
           onCancel={handleCancel}
+          onChange={handleFormChange}
           testID="add-playground-form"
         />
       </View>

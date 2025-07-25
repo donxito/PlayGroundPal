@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { View, Text, ScrollView, Alert, TouchableOpacity } from "react-native";
 import { Button } from "../ui/Button";
 import { Input } from "../ui/Input";
@@ -11,6 +11,7 @@ import {
   getCurrentLocation,
   checkLocationAvailability,
 } from "../../services/locationService";
+import { useNavigationGuard } from "../../hooks/useNavigationGuard";
 
 interface PlaygroundFormProps {
   initialData?: Partial<PlaygroundFormData>;
@@ -63,6 +64,44 @@ export const PlaygroundForm: React.FC<PlaygroundFormProps> = ({
 
   // Location modal state
   const [locationModalVisible, setLocationModalVisible] = useState(false);
+
+  // Track if form has unsaved changes
+  const hasUnsavedChanges = useMemo(() => {
+    if (!initialData) {
+      // For new forms, check if any field has been modified
+      return (
+        formData.name.trim() !== "" ||
+        formData.location.address !== "" ||
+        formData.location.coordinates !== undefined ||
+        formData.rating > 0 ||
+        formData.notes.trim() !== "" ||
+        formData.photos.length > 0
+      );
+    }
+
+    // For editing, compare with initial data
+    return (
+      formData.name !== (initialData.name || "") ||
+      formData.location.address !== (initialData.location?.address || "") ||
+      JSON.stringify(formData.location.coordinates) !==
+        JSON.stringify(initialData.location?.coordinates) ||
+      formData.rating !== (initialData.rating || 0) ||
+      formData.notes !== (initialData.notes || "") ||
+      JSON.stringify(formData.photos) !==
+        JSON.stringify(initialData.photos || [])
+    );
+  }, [formData, initialData]);
+
+  // Navigation guard for unsaved changes
+  const { guardedBack } = useNavigationGuard({
+    hasUnsavedChanges,
+    message:
+      "You have unsaved changes. Are you sure you want to leave without saving?",
+    onConfirmLeave: () => {
+      // Reset form state when leaving
+      handleReset();
+    },
+  });
 
   // Update form data when initialData changes
   useEffect(() => {
@@ -385,7 +424,13 @@ export const PlaygroundForm: React.FC<PlaygroundFormProps> = ({
           <Button
             title="Cancel"
             variant="outline"
-            onPress={onCancel}
+            onPress={() => {
+              if (hasUnsavedChanges) {
+                guardedBack();
+              } else {
+                onCancel();
+              }
+            }}
             disabled={loading}
             className="flex-1 mr-3"
             testID={testID ? `${testID}-cancel` : "playground-form-cancel"}

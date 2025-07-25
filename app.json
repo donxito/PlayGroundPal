@@ -8,6 +8,29 @@
     "scheme": "playgroundpal",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "linking": {
+      "prefixes": ["playgroundpal://", "https://playgroundpal.app"],
+      "config": {
+        "screens": {
+          "(tabs)": {
+            "screens": {
+              "index": "",
+              "add": "add"
+            }
+          },
+          "playground": {
+            "screens": {
+              "[id]": "playground/:id",
+              "edit": {
+                "screens": {
+                  "[id]": "playground/:id/edit"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "ios": {
       "supportsTablet": true
     },
