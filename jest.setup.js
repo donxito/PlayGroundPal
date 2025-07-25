@@ -34,6 +34,25 @@ jest.mock("expo-router", () => {
 
 global.__DEV__ = true;
 
+// Suppress act warnings for async operations in components
+// const originalError = console.error;
+// beforeEach(() => {
+//   console.error = (...args) => {
+//     if (
+//       typeof args[0] === "string" &&
+//       args[0].includes("An update to") &&
+//       args[0].includes("inside a test was not wrapped in act")
+//     ) {
+//       return;
+//     }
+//     originalError.call(console, ...args);
+//   };
+// });
+
+// afterEach(() => {
+//   console.error = originalError;
+// });
+
 // Mock for @react-native-async-storage/async-storage
 jest.mock("@react-native-async-storage/async-storage", () =>
   require("@react-native-async-storage/async-storage/jest/async-storage-mock")
@@ -56,11 +75,13 @@ jest.mock("react-native", () => ({
   TextInput: "TextInput",
   Image: "Image",
   FlatList: ({ data, renderItem, ListEmptyComponent, testID }) => {
-    const mockReact = require('react');
+    const mockReact = require("react");
     if (!data || data.length === 0) {
       return ListEmptyComponent ? ListEmptyComponent() : null;
     }
-    return mockReact.createElement('View', { testID }, 
+    return mockReact.createElement(
+      "View",
+      { testID },
       data.map((item, index) => renderItem({ item, index }))
     );
   },
@@ -87,6 +108,74 @@ jest.mock("react-native", () => ({
   Pressable: "Pressable",
   SafeAreaView: "SafeAreaView",
   useColorScheme: jest.fn(() => "light"),
+  Animated: {
+    View: "Animated.View",
+    Text: "Animated.Text",
+    Value: jest.fn(() => ({
+      setValue: jest.fn(),
+      addListener: jest.fn(),
+      removeListener: jest.fn(),
+      removeAllListeners: jest.fn(),
+      stopAnimation: jest.fn(),
+      resetAnimation: jest.fn(),
+      interpolate: jest.fn(() => ({
+        setValue: jest.fn(),
+        addListener: jest.fn(),
+        removeListener: jest.fn(),
+        removeAllListeners: jest.fn(),
+        stopAnimation: jest.fn(),
+        resetAnimation: jest.fn(),
+      })),
+    })),
+    timing: jest.fn(() => ({
+      start: jest.fn((callback) => callback && callback({ finished: true })),
+      stop: jest.fn(),
+      reset: jest.fn(),
+    })),
+    spring: jest.fn(() => ({
+      start: jest.fn((callback) => callback && callback({ finished: true })),
+      stop: jest.fn(),
+      reset: jest.fn(),
+    })),
+    parallel: jest.fn((animations) => ({
+      start: jest.fn((callback) => callback && callback({ finished: true })),
+      stop: jest.fn(),
+      reset: jest.fn(),
+    })),
+    sequence: jest.fn((animations) => ({
+      start: jest.fn((callback) => callback && callback({ finished: true })),
+      stop: jest.fn(),
+      reset: jest.fn(),
+    })),
+    delay: jest.fn(() => ({
+      start: jest.fn((callback) => callback && callback({ finished: true })),
+      stop: jest.fn(),
+      reset: jest.fn(),
+    })),
+    loop: jest.fn(() => ({
+      start: jest.fn((callback) => callback && callback({ finished: true })),
+      stop: jest.fn(),
+      reset: jest.fn(),
+    })),
+    createAnimatedComponent: jest.fn((component) => component),
+    Easing: {
+      linear: jest.fn(),
+      ease: jest.fn(),
+      quad: jest.fn(),
+      cubic: jest.fn(),
+      poly: jest.fn(),
+      sin: jest.fn(),
+      circle: jest.fn(),
+      exp: jest.fn(),
+      elastic: jest.fn(),
+      back: jest.fn(),
+      bounce: jest.fn(),
+      bezier: jest.fn(),
+      in: jest.fn(),
+      out: jest.fn(),
+      inOut: jest.fn(),
+    },
+  },
 }));
 
 // Mock expo-image
@@ -119,11 +208,21 @@ jest.mock("expo-haptics", () => ({
 // Mock react-native-gesture-handler
 jest.mock("react-native-gesture-handler", () => ({
   Swipeable: ({ children, renderRightActions, testID }) => {
-    const mockReact = require('react');
-    return mockReact.createElement('View', { testID }, [
-      children,
-      renderRightActions ? renderRightActions() : null
-    ]);
+    const mockReact = require("react");
+    return mockReact.createElement(
+      "View",
+      { testID },
+      [
+        mockReact.createElement("View", { key: "children" }, children),
+        renderRightActions
+          ? mockReact.createElement(
+              "View",
+              { key: "actions" },
+              renderRightActions()
+            )
+          : null,
+      ].filter(Boolean)
+    );
   },
   State: {},
   PanGestureHandler: "PanGestureHandler",

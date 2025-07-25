@@ -3,8 +3,9 @@
  *
  * Implements Zustand store for playground management with CRUD operations
  * Handles data persistence via storageService
+ * Integrates with error handling and undo functionality
  *
- * Requirements: 1.4, 5.3, 6.3, 10.1
+ * Requirements: 1.4, 5.3, 6.3, 10.1, 1.5, 6.5, 10.3, 10.4
  */
 
 import { create } from "zustand";
@@ -18,6 +19,9 @@ import {
   VALIDATION_RULES,
 } from "../types/playground";
 import { savePlaygrounds, loadPlaygrounds } from "../services/storageService";
+
+// Store will be enhanced with toast and undo functionality through hooks
+// Components using the store should also use useToast and useUndo hooks
 
 /**
  * Create Zustand store for playground management
@@ -218,6 +222,83 @@ export const usePlaygroundStore = create<PlaygroundStore>((set, get) => ({
    */
   setFilterBy: (filterBy) => {
     set({ filterBy });
+  },
+
+  /**
+   * Delete a playground with undo functionality
+   *
+   * @param id - ID of playground to delete
+   * @returns Promise that resolves with the deleted playground
+   */
+  deletePlaygroundWithUndo: async (id) => {
+    try {
+      set({ loading: true, error: null });
+
+      // Find playground to delete
+      const { playgrounds } = get();
+      const playgroundToDelete = playgrounds.find((p) => p.id === id);
+
+      if (!playgroundToDelete) {
+        throw new Error(`Playground with ID ${id} not found`);
+      }
+
+      // Remove playground from state
+      const updatedPlaygrounds = playgrounds.filter((p) => p.id !== id);
+      set({ playgrounds: updatedPlaygrounds, loading: false });
+
+      // Save updated playgrounds to storage
+      await savePlaygrounds(updatedPlaygrounds);
+
+      // Return the deleted playground for undo functionality
+      return playgroundToDelete;
+    } catch (error) {
+      const appError: AppError = {
+        type: "system",
+        message:
+          error instanceof Error
+            ? error.message
+            : "Failed to delete playground",
+        recoverable: true,
+        timestamp: new Date(),
+      };
+
+      set({ error: appError, loading: false });
+      throw appError;
+    }
+  },
+
+  /**
+   * Restore a deleted playground (for undo functionality)
+   *
+   * @param playground - Playground to restore
+   * @returns Promise that resolves when playground is restored
+   */
+  restorePlayground: async (playground) => {
+    try {
+      set({ loading: true, error: null });
+
+      // Add playground back to state
+      set((state) => ({
+        playgrounds: [...state.playgrounds, playground],
+        loading: false,
+      }));
+
+      // Save updated playgrounds to storage
+      await savePlaygrounds(get().playgrounds);
+    } catch (error) {
+      const appError: AppError = {
+        type: "system",
+        message:
+          error instanceof Error
+            ? error.message
+            : "Failed to restore playground",
+        recoverable: true,
+        timestamp: new Date(),
+      };
+
+      set({ error: appError, loading: false });
+      throw appError;
+    }
   },
 
   /**

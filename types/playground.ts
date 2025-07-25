@@ -59,6 +59,8 @@ export interface PlaygroundStore {
   ) => Promise<void>;
   updatePlayground: (id: string, updates: Partial<Playground>) => Promise<void>;
   deletePlayground: (id: string) => Promise<void>;
+  deletePlaygroundWithUndo: (id: string) => Promise<Playground>;
+  restorePlayground: (playground: Playground) => Promise<void>;
   loadPlaygrounds: () => Promise<void>;
   setSortBy: (sortBy: SortOption) => void;
   setFilterBy: (filterBy: FilterOption) => void;
