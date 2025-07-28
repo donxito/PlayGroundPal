@@ -8,9 +8,13 @@ import * as Linking from "expo-linking";
 import { ErrorBoundary } from "../components/ui/ErrorBoundary";
 import { ToastProvider } from "../components/ui/Toast";
 import { UndoProvider } from "../components/ui/UndoProvider";
+import { useLifecycle } from "../hooks/useLifecycle";
 
 export default function RootLayout() {
   const { loadPlaygrounds, playgrounds, loading } = usePlaygroundStore();
+
+  // Initialize lifecycle management
+  useLifecycle();
 
   useEffect(() => {
     loadPlaygrounds();

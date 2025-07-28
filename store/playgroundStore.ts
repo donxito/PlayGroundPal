@@ -20,8 +20,31 @@ import {
 } from "../types/playground";
 import { savePlaygrounds, loadPlaygrounds } from "../services/storageService";
 
+// Auto-save configuration
+const AUTO_SAVE_DELAY = 2000; // 2 seconds delay after state changes
+let autoSaveTimeout: number | null = null;
+
 // Store will be enhanced with toast and undo functionality through hooks
 // Components using the store should also use useToast and useUndo hooks
+
+/**
+ * Auto-save function that debounces save operations
+ */
+const autoSave = (getState: () => PlaygroundStore) => {
+  if (autoSaveTimeout) {
+    clearTimeout(autoSaveTimeout);
+  }
+
+  autoSaveTimeout = setTimeout(async () => {
+    try {
+      const { playgrounds } = getState();
+      await savePlaygrounds(playgrounds);
+      console.log("Auto-save completed");
+    } catch (error) {
+      console.error("Auto-save failed:", error);
+    }
+  }, AUTO_SAVE_DELAY) as unknown as number;
+};
 
 /**
  * Create Zustand store for playground management
@@ -64,6 +87,9 @@ export const usePlaygroundStore = create<PlaygroundStore>((set, get) => ({
 
       // Save updated playgrounds to storage
       await savePlaygrounds(get().playgrounds);
+
+      // Trigger auto-save for future changes
+      autoSave(get);
     } catch (error) {
       const appError: AppError = {
         type:
@@ -161,6 +187,9 @@ export const usePlaygroundStore = create<PlaygroundStore>((set, get) => ({
       // Save updated playgrounds to storage
       await savePlaygrounds(updatedPlaygrounds);
 
+      // Trigger auto-save for future changes
+      autoSave(get);
+
       // TODO: Add cleanup for orphaned photos in a future task
       // This would be implemented in task #16 (data persistence and app lifecycle handling)
     } catch (error) {
@@ -192,6 +221,9 @@ export const usePlaygroundStore = create<PlaygroundStore>((set, get) => ({
       const playgrounds = await loadPlaygrounds();
 
       set({ playgrounds, loading: false });
+
+      // Trigger auto-save for future changes
+      autoSave(get);
     } catch (error) {
       const appError: AppError = {
         type: "storage",
@@ -249,6 +281,9 @@ export const usePlaygroundStore = create<PlaygroundStore>((set, get) => ({
       // Save updated playgrounds to storage
       await savePlaygrounds(updatedPlaygrounds);
 
+      // Trigger auto-save for future changes
+      autoSave(get);
+
       // Return the deleted playground for undo functionality
       return playgroundToDelete;
     } catch (error) {
@@ -285,6 +320,9 @@ export const usePlaygroundStore = create<PlaygroundStore>((set, get) => ({
 
       // Save updated playgrounds to storage
       await savePlaygrounds(get().playgrounds);
+
+      // Trigger auto-save for future changes
+      autoSave(get);
     } catch (error) {
       const appError: AppError = {
         type: "system",
