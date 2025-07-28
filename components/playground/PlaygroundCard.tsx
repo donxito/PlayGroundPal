@@ -104,7 +104,7 @@ const PlaygroundCardComponent: React.FC<PlaygroundCardProps> = ({
       >
         <TouchableOpacity
           onPress={handleCardPress}
-          className="bg-surface rounded-2xl shadow-card mb-4 overflow-hidden active:scale-98"
+          className="bg-surface rounded-2xl shadow-lg mb-4 overflow-hidden active:scale-98"
           activeOpacity={0.9}
           testID={testID || "playground-card"}
         >

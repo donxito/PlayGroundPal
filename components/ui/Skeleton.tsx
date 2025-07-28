@@ -9,7 +9,6 @@
 
 import React from "react";
 import { View, Dimensions } from "react-native";
-import { MotiView } from "moti";
 
 interface SkeletonProps {
   width?: number;
@@ -28,21 +27,10 @@ export const Skeleton: React.FC<SkeletonProps> = ({
   testID,
 }) => {
   return (
-    <MotiView
+    <View
       className={`bg-gray-200 rounded ${className}`}
       style={{ width, height }}
       testID={testID}
-      from={{
-        opacity: 0.6,
-      }}
-      animate={{
-        opacity: 1,
-      }}
-      transition={{
-        type: "timing",
-        duration: 1000,
-        loop: true,
-      }}
     />
   );
 };

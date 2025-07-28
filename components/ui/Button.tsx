@@ -45,15 +45,15 @@ export const Button: React.FC<ButtonProps> = ({
 }) => {
   // Base classes for the button - more rounded and playful
   const baseClasses =
-    "flex flex-row items-center justify-center rounded-2xl shadow-card active:scale-95";
+    "flex flex-row items-center justify-center rounded-2xl shadow-lg active:scale-95";
 
   // Variant classes - updated with new color palette
   const variantClasses = {
-    primary: "bg-primary-500 active:bg-primary-600 shadow-playful",
-    secondary: "bg-secondary-500 active:bg-secondary-600 shadow-playful",
+    primary: "bg-primary-500 active:bg-primary-600 shadow-lg",
+    secondary: "bg-secondary-500 active:bg-secondary-600 shadow-lg",
     outline: "bg-transparent border-2 border-primary-300 active:bg-primary-50",
-    danger: "bg-accent-500 active:bg-accent-600 shadow-playful",
-    fun: "bg-gradient-to-r from-fun-pink to-fun-purple active:from-fun-purple active:to-fun-pink shadow-playful",
+    danger: "bg-accent-500 active:bg-accent-600 shadow-lg",
+    fun: "bg-gradient-to-r from-fun-pink to-fun-purple active:from-fun-purple active:to-fun-pink shadow-lg",
   };
 
   // Size classes - improved touch targets

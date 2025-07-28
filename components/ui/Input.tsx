@@ -85,7 +85,7 @@ export const Input: React.FC<InputProps> = ({
       return "border-accent-500 bg-accent-50";
     }
     if (isFocused) {
-      return "border-primary-500 bg-white shadow-playful";
+      return "border-primary-500 bg-white shadow-lg";
     }
     if (disabled) {
       return "border-gray-300 bg-gray-100 text-text-muted";

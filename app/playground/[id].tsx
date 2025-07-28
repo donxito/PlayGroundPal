@@ -21,7 +21,6 @@ import {
   calculateDistanceFromCurrent,
 } from "../../services/locationService";
 import { Playground } from "../../types/playground";
-import { MotiView } from "moti";
 
 /**
  * Playground Detail Screen
@@ -155,12 +154,7 @@ export default function PlaygroundDetailScreen() {
 
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
         {/* Photo Gallery */}
-        <MotiView
-          from={{ opacity: 0, translateY: 20 }}
-          animate={{ opacity: 1, translateY: 0 }}
-          transition={{ type: "timing", duration: 400 }}
-          className="bg-white p-4 mb-2"
-        >
+        <View className="bg-white p-4 mb-2">
           <PhotoGallery
             playgroundId={playground.id}
             photos={playground.photos}
@@ -168,15 +162,10 @@ export default function PlaygroundDetailScreen() {
             editable={false}
             testID="playground-detail-gallery"
           />
-        </MotiView>
+        </View>
 
         {/* Playground Details */}
-        <MotiView
-          from={{ opacity: 0, translateY: 20 }}
-          animate={{ opacity: 1, translateY: 0 }}
-          transition={{ type: "timing", duration: 400, delay: 100 }}
-          className="bg-white p-4 mb-2"
-        >
+        <View className="bg-white p-4 mb-2">
           <Text className="text-2xl font-bold text-gray-800 mb-2">
             {playground.name}
           </Text>
@@ -198,15 +187,10 @@ export default function PlaygroundDetailScreen() {
               <Text className="text-gray-700">{playground.notes}</Text>
             </View>
           )}
-        </MotiView>
+        </View>
 
         {/* Location Information */}
-        <MotiView
-          from={{ opacity: 0, translateY: 20 }}
-          animate={{ opacity: 1, translateY: 0 }}
-          transition={{ type: "timing", duration: 400, delay: 200 }}
-          className="bg-white p-4 mb-2"
-        >
+        <View className="bg-white p-4 mb-2">
           <Text className="text-lg font-semibold text-gray-800 mb-2">
             Location
           </Text>
@@ -242,15 +226,10 @@ export default function PlaygroundDetailScreen() {
               <Text className="text-white font-medium ml-2">Open in Maps</Text>
             </TouchableOpacity>
           )}
-        </MotiView>
+        </View>
 
         {/* Action Buttons */}
-        <MotiView
-          from={{ opacity: 0, translateY: 20 }}
-          animate={{ opacity: 1, translateY: 0 }}
-          transition={{ type: "timing", duration: 400, delay: 300 }}
-          className="p-4 flex-row justify-between"
-        >
+        <View className="p-4 flex-row justify-between">
           <TouchableOpacity
             onPress={handleEdit}
             className="bg-blue-500 rounded-lg py-3 px-6 flex-1 mr-2 items-center"
@@ -266,7 +245,7 @@ export default function PlaygroundDetailScreen() {
           >
             <Text className="text-white font-medium">Delete</Text>
           </TouchableOpacity>
-        </MotiView>
+        </View>
       </ScrollView>
 
       {/* Delete Confirmation Modal */}

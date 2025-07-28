@@ -90,7 +90,7 @@ export const SortFilterBar: React.FC<SortFilterBarProps> = ({ testID }) => {
         activeOpacity={1}
         onPress={() => setSortModalVisible(false)}
       >
-        <View className="bg-surface rounded-2xl m-4 p-6 absolute bottom-0 left-0 right-0 shadow-playful">
+        <View className="bg-surface rounded-2xl m-4 p-6 absolute bottom-0 left-0 right-0 shadow-lg">
           <View className="flex-row items-center mb-6">
             <Text className="text-2xl mr-2">🔀</Text>
             <Text className="text-xl font-bold text-text-primary">Sort By</Text>
@@ -149,7 +149,7 @@ export const SortFilterBar: React.FC<SortFilterBarProps> = ({ testID }) => {
         activeOpacity={1}
         onPress={() => setFilterModalVisible(false)}
       >
-        <View className="bg-surface rounded-2xl m-4 p-6 absolute bottom-0 left-0 right-0 shadow-playful">
+        <View className="bg-surface rounded-2xl m-4 p-6 absolute bottom-0 left-0 right-0 shadow-lg">
           <View className="flex-row items-center mb-6">
             <Text className="text-2xl mr-2">🔍</Text>
             <Text className="text-xl font-bold text-text-primary">
@@ -299,7 +299,7 @@ export const SortFilterBar: React.FC<SortFilterBarProps> = ({ testID }) => {
     >
       {/* Sort button */}
       <TouchableOpacity
-        className="flex-row items-center bg-surface px-4 py-3 rounded-xl shadow-card active:scale-95"
+        className="flex-row items-center bg-surface px-4 py-3 rounded-xl shadow-lg active:scale-95"
         onPress={() => setSortModalVisible(true)}
         testID={testID ? `${testID}-sort-button` : "sort-button"}
         activeOpacity={0.8}
@@ -312,7 +312,7 @@ export const SortFilterBar: React.FC<SortFilterBarProps> = ({ testID }) => {
 
       {/* Filter button */}
       <TouchableOpacity
-        className={`flex-row items-center px-4 py-3 rounded-xl shadow-card active:scale-95 ${
+        className={`flex-row items-center px-4 py-3 rounded-xl shadow-lg active:scale-95 ${
           hasActiveFilters
             ? "bg-gradient-to-r from-fun-yellow to-fun-orange"
             : "bg-surface"

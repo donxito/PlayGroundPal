@@ -97,7 +97,7 @@ export default function SettingsScreen() {
             <Text className="text-xl font-bold text-text-primary">Theme</Text>
           </View>
 
-          <View className="bg-surface rounded-2xl p-4 shadow-card">
+          <View className="bg-surface rounded-2xl p-4 shadow-lg">
             <Text className="text-base font-semibold text-text-primary mb-3">
               Appearance
             </Text>
@@ -140,7 +140,7 @@ export default function SettingsScreen() {
             </Text>
           </View>
 
-          <View className="bg-surface rounded-2xl p-4 shadow-card">
+          <View className="bg-surface rounded-2xl p-4 shadow-lg">
             <Text className="text-base font-semibold text-text-primary mb-3">
               Choose your favorite color theme
             </Text>
@@ -185,7 +185,7 @@ export default function SettingsScreen() {
             </Text>
           </View>
 
-          <View className="bg-surface rounded-2xl p-4 shadow-card">
+          <View className="bg-surface rounded-2xl p-4 shadow-lg">
             {/* Haptic Feedback */}
             <TouchableOpacity
               className="flex-row items-center justify-between p-4 rounded-xl mb-3 active:bg-gray-50"
