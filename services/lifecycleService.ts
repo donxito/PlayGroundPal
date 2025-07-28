@@ -21,6 +21,16 @@ const AUTO_SAVE_INTERVAL = 30000; // 30 seconds
 let storeInstance: any = null;
 
 /**
+ * Reset service state for testing purposes
+ * This should only be used in tests
+ */
+export const resetLifecycleService = (customLastSaveTime?: number) => {
+  isAppActive = true;
+  lastSaveTime = customLastSaveTime ?? Date.now();
+  storeInstance = null;
+};
+
+/**
  * Set store instance for lifecycle operations
  * This should be called from a React component
  */

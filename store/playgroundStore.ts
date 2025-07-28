@@ -47,6 +47,16 @@ const autoSave = (getState: () => PlaygroundStore) => {
 };
 
 /**
+ * Clear auto-save timeout (for testing cleanup)
+ */
+export const clearAutoSaveTimeout = () => {
+  if (autoSaveTimeout) {
+    clearTimeout(autoSaveTimeout);
+    autoSaveTimeout = null;
+  }
+};
+
+/**
  * Create Zustand store for playground management
  */
 export const usePlaygroundStore = create<PlaygroundStore>((set, get) => ({
