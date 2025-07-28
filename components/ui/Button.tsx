@@ -5,7 +5,7 @@ interface ButtonProps {
   onPress: () => void;
   title?: string;
   children?: React.ReactNode;
-  variant?: "primary" | "secondary" | "outline" | "danger";
+  variant?: "primary" | "secondary" | "outline" | "danger" | "fun";
   size?: "sm" | "md" | "lg";
   disabled?: boolean;
   loading?: boolean;
@@ -16,12 +16,12 @@ interface ButtonProps {
 }
 
 /**
- * Button component with NativeWind styling
+ * Button component with NativeWind styling - Playful and fun design
  *
  * @param onPress Function to call when button is pressed
  * @param title Text to display in the button (alternative to children)
  * @param children React children to display in the button (alternative to title)
- * @param variant Visual style variant (primary, secondary, outline, danger)
+ * @param variant Visual style variant (primary, secondary, outline, danger, fun)
  * @param size Size of the button (sm, md, lg)
  * @param disabled Whether the button is disabled
  * @param loading Whether to show a loading indicator
@@ -43,30 +43,33 @@ export const Button: React.FC<ButtonProps> = ({
   accessibilityLabel,
   testID,
 }) => {
-  // Base classes for the button
-  const baseClasses = "flex flex-row items-center justify-center rounded-lg";
+  // Base classes for the button - more rounded and playful
+  const baseClasses =
+    "flex flex-row items-center justify-center rounded-2xl shadow-card active:scale-95";
 
-  // Variant classes
+  // Variant classes - updated with new color palette
   const variantClasses = {
-    primary: "bg-blue-500 active:bg-blue-600",
-    secondary: "bg-gray-200 active:bg-gray-300",
-    outline: "bg-transparent border border-gray-300 active:bg-gray-100",
-    danger: "bg-red-500 active:bg-red-600",
+    primary: "bg-primary-500 active:bg-primary-600 shadow-playful",
+    secondary: "bg-secondary-500 active:bg-secondary-600 shadow-playful",
+    outline: "bg-transparent border-2 border-primary-300 active:bg-primary-50",
+    danger: "bg-accent-500 active:bg-accent-600 shadow-playful",
+    fun: "bg-gradient-to-r from-fun-pink to-fun-purple active:from-fun-purple active:to-fun-pink shadow-playful",
   };
 
-  // Size classes
+  // Size classes - improved touch targets
   const sizeClasses = {
-    sm: "px-3 py-1.5",
-    md: "px-4 py-2",
-    lg: "px-6 py-3",
+    sm: "px-4 py-2.5 min-h-[44px]",
+    md: "px-6 py-3 min-h-[48px]",
+    lg: "px-8 py-4 min-h-[56px]",
   };
 
-  // Text color classes
+  // Text color classes - updated for better contrast
   const textColorClasses = {
-    primary: "text-white",
-    secondary: "text-gray-800",
-    outline: "text-gray-800",
-    danger: "text-white",
+    primary: "text-white font-semibold",
+    secondary: "text-white font-semibold",
+    outline: "text-primary-600 font-semibold",
+    danger: "text-white font-semibold",
+    fun: "text-white font-bold",
   };
 
   // Text size classes
@@ -81,7 +84,7 @@ export const Button: React.FC<ButtonProps> = ({
 
   // Combine all classes
   const buttonClasses = `${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${disabledClasses} ${className}`;
-  const textClasses = `font-medium ${textColorClasses[variant]} ${textSizeClasses[size]} ${textClassName}`;
+  const textClasses = `${textColorClasses[variant]} ${textSizeClasses[size]} ${textClassName}`;
 
   return (
     <TouchableOpacity
@@ -96,11 +99,12 @@ export const Button: React.FC<ButtonProps> = ({
       accessibilityRole="button"
       accessibilityState={{ disabled, busy: loading }}
       testID={testID}
+      activeOpacity={0.8}
     >
       {loading ? (
         <ActivityIndicator
           size="small"
-          color={variant === "outline" ? "#1F2937" : "#FFFFFF"}
+          color={variant === "outline" ? "#2563eb" : "#FFFFFF"}
           className="mr-2"
         />
       ) : null}

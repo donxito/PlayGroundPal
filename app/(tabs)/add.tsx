@@ -46,6 +46,7 @@ export const showCancelConfirmation = (onYes: () => void) => {
  * - Form submission handling with store integration
  * - Validation error handling
  * - Navigation back to list after successful creation
+ * - Playful and fun design with delightful interactions
  *
  */
 export default function AddPlaygroundScreen() {
@@ -110,18 +111,28 @@ export default function AddPlaygroundScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-50">
+    <SafeAreaView className="flex-1 bg-background">
       <StatusBar style="dark" />
 
       <View className="flex-1 px-4 pt-4">
         {/* Header */}
-        <View className="mb-4">
-          <Text className="text-2xl font-bold text-gray-800">
-            Add New Playground
-          </Text>
-          <Text className="text-gray-600">
-            Fill in the details to add a new playground
-          </Text>
+        <View className="mb-6">
+          <View className="flex-row items-center mb-3">
+            <Text className="text-4xl mr-3">➕</Text>
+            <Text className="text-3xl font-bold text-text-primary">
+              Add New Playground
+            </Text>
+          </View>
+          <View className="bg-gradient-to-r from-primary-100 to-secondary-100 rounded-2xl p-4">
+            <Text className="text-text-primary font-semibold mb-2">
+              🎯 Let&apos;s discover a new playground!
+            </Text>
+            <Text className="text-text-secondary text-sm leading-5">
+              Fill in the details below to add a new playground to your
+              collection. Don&apos;t forget to add photos and rate your
+              experience! 📸⭐
+            </Text>
+          </View>
         </View>
 
         {/* Playground Form */}

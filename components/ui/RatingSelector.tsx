@@ -17,6 +17,7 @@ interface RatingSelectorProps {
 
 /**
  * RatingSelector component with interactive emoji rating system (1-5 scale)
+ * Playful and fun design with big emojis and delightful interactions
  *
  * @param rating Current rating value (1-5)
  * @param onRatingChange Function called when rating changes
@@ -43,43 +44,44 @@ export const RatingSelector: React.FC<RatingSelectorProps> = ({
   ratingContainerClassName = "",
   testID,
 }) => {
-  // Rating emojis for different states
+  // Rating emojis for different states - more playful
   const emojis = {
     empty: "⭐",
     filled: "🌟",
+    super: "✨",
   };
 
-  // Size classes for emojis
+  // Size classes for emojis - bigger and more prominent
   const sizeClasses = {
-    sm: "text-2xl",
-    md: "text-3xl",
-    lg: "text-4xl",
+    sm: "text-3xl",
+    md: "text-4xl",
+    lg: "text-5xl",
   };
 
   // Container classes
   const containerClasses = `${className}`;
 
-  // Label classes
-  const labelClasses = `text-sm font-medium text-gray-700 mb-2 ${labelClassName}`;
+  // Label classes - more playful styling
+  const labelClasses = `text-base font-bold text-text-primary mb-3 ${labelClassName}`;
 
   // Rating container classes
-  const ratingContainerClasses = `flex-row items-center ${ratingContainerClassName}`;
+  const ratingContainerClasses = `flex-row items-center justify-center ${ratingContainerClassName}`;
 
-  // Rating descriptions
+  // Rating descriptions - more fun and descriptive
   const getRatingDescription = (ratingValue: number): string => {
     switch (ratingValue) {
       case 1:
-        return "Poor";
+        return "Not great 😕";
       case 2:
-        return "Fair";
+        return "Okay 🤷‍♂️";
       case 3:
-        return "Good";
+        return "Good! 😊";
       case 4:
-        return "Very Good";
+        return "Very Good! 🎉";
       case 5:
-        return "Excellent";
+        return "Amazing! 🚀";
       default:
-        return "No rating";
+        return "No rating yet";
     }
   };
 
@@ -93,20 +95,31 @@ export const RatingSelector: React.FC<RatingSelectorProps> = ({
 
   return (
     <View className={containerClasses} testID={testID}>
-      {showLabel && <Text className={labelClasses}>{label}</Text>}
+      {showLabel && (
+        <Text className={labelClasses}>
+          {label} {rating > 0 && `(${rating}/5)`}
+        </Text>
+      )}
 
       <View className={ratingContainerClasses}>
         {Array.from({ length: maxRating }, (_, index) => {
           const ratingValue = index + 1;
           const isSelected = ratingValue <= rating;
-          const emoji = isSelected ? emojis.filled : emojis.empty;
+          const isPerfect = ratingValue === 5 && rating === 5;
+          const emoji = isPerfect
+            ? emojis.super
+            : isSelected
+            ? emojis.filled
+            : emojis.empty;
 
           return (
             <TouchableOpacity
               key={ratingValue}
               onPress={() => handleRatingPress(ratingValue)}
               disabled={disabled}
-              className={`mr-1 ${disabled ? "opacity-50" : ""}`}
+              className={`mr-2 p-1 rounded-full ${
+                disabled ? "opacity-50" : "active:scale-110"
+              }`}
               accessibilityLabel={`${ratingValue} star${
                 ratingValue !== 1 ? "s" : ""
               }`}
@@ -121,10 +134,15 @@ export const RatingSelector: React.FC<RatingSelectorProps> = ({
                   ? `${testID}-star-${ratingValue}`
                   : `rating-star-${ratingValue}`
               }
+              activeOpacity={0.7}
             >
               <Text
                 className={`${sizeClasses[size]} ${
-                  isSelected ? "" : "opacity-60"
+                  isSelected
+                    ? isPerfect
+                      ? "animate-bounce-gentle"
+                      : "animate-pulse-gentle"
+                    : "opacity-40"
                 }`}
               >
                 {emoji}
@@ -132,18 +150,17 @@ export const RatingSelector: React.FC<RatingSelectorProps> = ({
             </TouchableOpacity>
           );
         })}
-
-        {rating > 0 && (
-          <Text className="ml-3 text-sm text-gray-600">
-            {getRatingDescription(rating)}
-          </Text>
-        )}
       </View>
 
       {rating > 0 && (
-        <Text className="text-xs text-gray-500 mt-1">
-          {rating} out of {maxRating} stars
-        </Text>
+        <View className="mt-3 items-center">
+          <Text className="text-base font-semibold text-fun-orange mb-1">
+            {getRatingDescription(rating)}
+          </Text>
+          <Text className="text-sm text-text-secondary">
+            {rating} out of {maxRating} stars
+          </Text>
+        </View>
       )}
     </View>
   );

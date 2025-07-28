@@ -96,8 +96,8 @@ describe("PlaygroundListScreen", () => {
     const { getByText, getAllByTestId } = render(<PlaygroundListScreen />);
 
     // Check header
-    expect(getByText("My Playgrounds")).toBeTruthy();
-    expect(getByText("2 playgrounds")).toBeTruthy();
+    expect(getByText("PlayGroundPal")).toBeTruthy();
+    expect(getByText("2 playgrounds in your collection")).toBeTruthy();
 
     // Check playground cards
     const cards = getAllByTestId("playground-card");
@@ -117,9 +117,11 @@ describe("PlaygroundListScreen", () => {
 
     const { getByText } = render(<PlaygroundListScreen />);
 
-    expect(getByText("No playgrounds yet")).toBeTruthy();
+    expect(getByText("No playgrounds yet!")).toBeTruthy();
     expect(
-      getByText("Add your first playground by tapping the + button below")
+      getByText(
+        /Start your playground adventure by adding your first playground!/
+      )
     ).toBeTruthy();
   });
 
@@ -131,7 +133,7 @@ describe("PlaygroundListScreen", () => {
 
     expect(getByText("No matching playgrounds")).toBeTruthy();
     expect(
-      getByText("Try adjusting your filters to see more results")
+      getByText(/Try adjusting your filters to discover more playgrounds!/)
     ).toBeTruthy();
   });
 
@@ -168,6 +170,6 @@ describe("PlaygroundListScreen", () => {
 
     const { getByText } = render(<PlaygroundListScreen />);
 
-    expect(getByText("1 playground")).toBeTruthy();
+    expect(getByText("1 playground in your collection")).toBeTruthy();
   });
 });

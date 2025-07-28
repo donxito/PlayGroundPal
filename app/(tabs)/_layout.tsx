@@ -10,18 +10,20 @@ import { BlurView } from "expo-blur";
  * Implements tab-based navigation for the main app screens with:
  * - Playground List (Home)
  * - Add Playground
+ * - Settings (Personalization)
  * - Enhanced animations and styling
  * - Platform-specific optimizations
+ * - Playful and fun design with delightful interactions
  */
 export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: "#3498db",
-        tabBarInactiveTintColor: "#718096",
+        tabBarActiveTintColor: "#3b82f6",
+        tabBarInactiveTintColor: "#94a3b8",
         tabBarStyle: {
           backgroundColor:
-            Platform.OS === "ios" ? "rgba(255, 255, 255, 0.9)" : "#ffffff",
+            Platform.OS === "ios" ? "rgba(255, 255, 255, 0.95)" : "#ffffff",
           borderTopColor: "#e2e8f0",
           borderTopWidth: 1,
           paddingTop: 8,
@@ -38,7 +40,7 @@ export default function TabLayout() {
         },
         tabBarLabelStyle: {
           fontSize: 12,
-          fontWeight: "500",
+          fontWeight: "600",
           marginTop: 4,
         },
         tabBarIconStyle: {
@@ -47,7 +49,6 @@ export default function TabLayout() {
         headerShown: false,
         // Enhanced tab transitions
         animation: "shift",
-        animationDuration: 200,
       }}
     >
       <Tabs.Screen
@@ -61,6 +62,7 @@ export default function TabLayout() {
                 justifyContent: "center",
                 transform: [{ scale: focused ? 1.1 : 1 }],
               }}
+              className={`p-2 rounded-full ${focused ? "bg-primary-100" : ""}`}
             >
               <Ionicons
                 name={focused ? "map" : "map-outline"}
@@ -83,9 +85,36 @@ export default function TabLayout() {
                 justifyContent: "center",
                 transform: [{ scale: focused ? 1.1 : 1 }],
               }}
+              className={`p-2 rounded-full ${
+                focused ? "bg-secondary-100" : ""
+              }`}
             >
               <Ionicons
                 name={focused ? "add-circle" : "add-circle-outline"}
+                size={size}
+                color={color}
+              />
+            </View>
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: "Settings",
+          tabBarIcon: ({ color, size, focused }) => (
+            <View
+              style={{
+                alignItems: "center",
+                justifyContent: "center",
+                transform: [{ scale: focused ? 1.1 : 1 }],
+              }}
+              className={`p-2 rounded-full ${
+                focused ? "bg-fun-purple/20" : ""
+              }`}
+            >
+              <Ionicons
+                name={focused ? "settings" : "settings-outline"}
                 size={size}
                 color={color}
               />

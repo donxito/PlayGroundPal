@@ -25,6 +25,7 @@ interface InputProps {
 
 /**
  * Input component with validation states and NativeWind styling
+ * Playful and fun design with delightful interactions
  *
  * @param value Current input value
  * @param onChangeText Function called when text changes
@@ -72,34 +73,34 @@ export const Input: React.FC<InputProps> = ({
   // Container classes
   const containerClasses = `mb-4 ${className}`;
 
-  // Label classes
-  const labelClasses = `text-sm font-medium text-gray-700 mb-1 ${labelClassName}`;
+  // Label classes - more playful styling
+  const labelClasses = `text-base font-semibold text-text-primary mb-2 ${labelClassName}`;
 
-  // Input base classes
-  const baseInputClasses = "border rounded-lg px-3 py-2 text-base";
+  // Input base classes - more rounded and playful
+  const baseInputClasses = "border-2 rounded-xl px-4 py-3 text-base shadow-sm";
 
-  // Input state classes
+  // Input state classes - updated with new color palette
   const getInputStateClasses = () => {
     if (error) {
-      return "border-red-500 bg-red-50";
+      return "border-accent-500 bg-accent-50";
     }
     if (isFocused) {
-      return "border-blue-500 bg-white";
+      return "border-primary-500 bg-white shadow-playful";
     }
     if (disabled) {
-      return "border-gray-300 bg-gray-100 text-gray-500";
+      return "border-gray-300 bg-gray-100 text-text-muted";
     }
     return "border-gray-300 bg-white";
   };
 
   // Multiline classes
-  const multilineClasses = multiline ? "min-h-[80px]" : "h-12";
+  const multilineClasses = multiline ? "min-h-[100px]" : "min-h-[48px]";
 
   // Combine input classes
   const inputClasses = `${baseInputClasses} ${getInputStateClasses()} ${multilineClasses} ${inputClassName}`;
 
-  // Error classes
-  const errorClasses = `text-sm text-red-600 mt-1 ${errorClassName}`;
+  // Error classes - more playful styling
+  const errorClasses = `text-sm text-accent-600 mt-2 font-medium ${errorClassName}`;
 
   return (
     <View className={containerClasses}>
@@ -122,10 +123,18 @@ export const Input: React.FC<InputProps> = ({
         onBlur={() => setIsFocused(false)}
         accessibilityLabel={accessibilityLabel || label}
         testID={testID}
-        placeholderTextColor="#9CA3AF"
+        placeholderTextColor="#94a3b8"
+        style={{
+          textAlignVertical: multiline ? "top" : "center",
+        }}
       />
 
-      {error && <Text className={errorClasses}>{error}</Text>}
+      {error && (
+        <View className="flex-row items-center mt-2">
+          <Text className="text-accent-500 mr-1">⚠️</Text>
+          <Text className={errorClasses}>{error}</Text>
+        </View>
+      )}
     </View>
   );
 };

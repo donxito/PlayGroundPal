@@ -16,6 +16,7 @@ interface PlaygroundCardProps {
 /**
  * PlaygroundCard component displays a summary of playground information
  * with swipe-to-delete functionality and navigation to detail view
+ * Playful and fun design with delightful interactions
  *
  * @param playground The playground data to display
  * @param testID Test identifier for testing
@@ -77,18 +78,20 @@ const PlaygroundCardComponent: React.FC<PlaygroundCardProps> = ({
   const renderRightActions = () => {
     return (
       <TouchableOpacity
-        className="bg-red-500 w-20 h-full justify-center items-center"
+        className="bg-gradient-to-r from-accent-500 to-accent-600 w-20 h-full justify-center items-center rounded-r-2xl"
         onPress={() => setDeleteModalVisible(true)}
         testID={testID ? `${testID}-delete-action` : "playground-delete-action"}
+        activeOpacity={0.8}
       >
-        <Text className="text-white font-bold">Delete</Text>
+        <Text className="text-white font-bold text-sm">🗑️</Text>
+        <Text className="text-white font-semibold text-xs mt-1">Delete</Text>
       </TouchableOpacity>
     );
   };
 
   // Calculate dimensions for the card and image
   const screenWidth = Dimensions.get("window").width;
-  const imageSize = 80; // Fixed size for thumbnail
+  const imageSize = 90; // Slightly larger for better visual impact
 
   return (
     <>
@@ -101,26 +104,26 @@ const PlaygroundCardComponent: React.FC<PlaygroundCardProps> = ({
       >
         <TouchableOpacity
           onPress={handleCardPress}
-          className="bg-white rounded-lg shadow-sm mb-3 overflow-hidden"
-          activeOpacity={0.7}
+          className="bg-surface rounded-2xl shadow-card mb-4 overflow-hidden active:scale-98"
+          activeOpacity={0.9}
           testID={testID || "playground-card"}
         >
-          <View className="flex-row p-3">
+          <View className="flex-row p-4">
             {/* Thumbnail */}
-            <View className="mr-3">
+            <View className="mr-4">
               {thumbnailImage ? (
                 <ThumbnailImage
                   source={{ uri: thumbnailImage }}
                   style={{ width: imageSize, height: imageSize }}
-                  className="rounded-lg"
+                  className="rounded-xl"
                   testID={testID ? `${testID}-image` : "playground-image"}
                 />
               ) : (
                 <View
-                  className="bg-gray-200 rounded-lg items-center justify-center"
+                  className="bg-gradient-to-br from-primary-100 to-primary-200 rounded-xl items-center justify-center"
                   style={{ width: imageSize, height: imageSize }}
                 >
-                  <Text className="text-gray-400 text-3xl">🏞️</Text>
+                  <Text className="text-4xl">🏞️</Text>
                 </View>
               )}
             </View>
@@ -129,36 +132,53 @@ const PlaygroundCardComponent: React.FC<PlaygroundCardProps> = ({
             <View className="flex-1 justify-between">
               <View>
                 <Text
-                  className="text-lg font-bold text-gray-800 mb-1"
+                  className="text-xl font-bold text-text-primary mb-2"
                   numberOfLines={1}
                   testID={testID ? `${testID}-name` : "playground-name"}
                 >
                   {playground.name}
                 </Text>
 
-                <Text
-                  className="text-sm text-gray-600 mb-2"
-                  numberOfLines={2}
-                  testID={testID ? `${testID}-location` : "playground-location"}
-                >
-                  {getLocationDisplay()}
-                </Text>
+                <View className="flex-row items-center mb-2">
+                  <Text className="text-fun-teal text-lg mr-2">📍</Text>
+                  <Text
+                    className="text-sm text-text-secondary flex-1"
+                    numberOfLines={2}
+                    testID={
+                      testID ? `${testID}-location` : "playground-location"
+                    }
+                  >
+                    {getLocationDisplay()}
+                  </Text>
+                </View>
               </View>
 
               <View className="flex-row justify-between items-center">
-                <Text
-                  className="text-sm text-yellow-500"
-                  testID={testID ? `${testID}-rating` : "playground-rating"}
-                >
-                  {getRatingEmoji(playground.rating)}
-                </Text>
+                <View className="flex-row items-center">
+                  <Text
+                    className="text-2xl mr-2"
+                    testID={testID ? `${testID}-rating` : "playground-rating"}
+                  >
+                    {getRatingEmoji(playground.rating)}
+                  </Text>
+                  <Text className="text-sm text-fun-orange font-semibold">
+                    {playground.rating}/5
+                  </Text>
+                </View>
 
-                <Text
-                  className="text-xs text-gray-500"
-                  testID={testID ? `${testID}-date` : "playground-date"}
-                >
-                  Added {formatDate(playground.dateAdded)}
-                </Text>
+                <View className="items-end">
+                  <Text
+                    className="text-xs text-text-muted font-medium"
+                    testID={testID ? `${testID}-date` : "playground-date"}
+                  >
+                    Added {formatDate(playground.dateAdded)}
+                  </Text>
+                  {playground.notes && (
+                    <Text className="text-xs text-fun-purple font-medium mt-1">
+                      📝 Has notes
+                    </Text>
+                  )}
+                </View>
               </View>
             </View>
           </View>

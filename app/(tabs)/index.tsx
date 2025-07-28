@@ -24,6 +24,7 @@ import { ListOptimizer, PerformanceMonitor } from "../../utils/performance";
  *
  * Displays a list of all saved playgrounds with sorting and filtering options.
  * Implements pull-to-refresh functionality and empty state display.
+ * Playful and fun design with delightful interactions.
  */
 export default function PlaygroundListScreen() {
   // Get playground data and actions from store
@@ -102,14 +103,23 @@ export default function PlaygroundListScreen() {
     if (loading) return null;
 
     return (
-      <View className="flex-1 justify-center items-center p-6">
-        <Text className="text-5xl mb-4">🏞️</Text>
-        <Text className="text-xl font-bold text-gray-800 mb-2 text-center">
-          No playgrounds yet
+      <View className="flex-1 justify-center items-center p-8">
+        <Text className="text-8xl mb-6 animate-bounce-gentle">🎠</Text>
+        <Text className="text-2xl font-bold text-text-primary mb-3 text-center">
+          No playgrounds yet!
         </Text>
-        <Text className="text-gray-600 text-center mb-6">
-          Add your first playground by tapping the + button below
+        <Text className="text-text-secondary text-center mb-8 text-lg leading-6">
+          Start your playground adventure by adding your first playground! 🚀
         </Text>
+        <View className="bg-gradient-to-r from-primary-100 to-secondary-100 rounded-2xl p-6 w-full max-w-sm">
+          <Text className="text-center text-text-primary font-semibold mb-2">
+            💡 Pro tip:
+          </Text>
+          <Text className="text-center text-text-secondary text-sm">
+            Tap the + button below to add your first playground and start
+            building your collection!
+          </Text>
+        </View>
       </View>
     );
   };
@@ -119,14 +129,22 @@ export default function PlaygroundListScreen() {
     if (loading || playgrounds.length === 0) return null;
 
     return (
-      <View className="flex-1 justify-center items-center p-6">
-        <Text className="text-5xl mb-4">🔍</Text>
-        <Text className="text-xl font-bold text-gray-800 mb-2 text-center">
+      <View className="flex-1 justify-center items-center p-8">
+        <Text className="text-8xl mb-6 animate-wiggle">🔍</Text>
+        <Text className="text-2xl font-bold text-text-primary mb-3 text-center">
           No matching playgrounds
         </Text>
-        <Text className="text-gray-600 text-center mb-6">
-          Try adjusting your filters to see more results
+        <Text className="text-text-secondary text-center mb-8 text-lg leading-6">
+          Try adjusting your filters to discover more playgrounds! 🎯
         </Text>
+        <View className="bg-gradient-to-r from-fun-yellow to-fun-orange rounded-2xl p-6 w-full max-w-sm">
+          <Text className="text-center text-white font-semibold mb-2">
+            🌟 Quick tip:
+          </Text>
+          <Text className="text-center text-white text-sm">
+            Clear your filters to see all your playgrounds again!
+          </Text>
+        </View>
       </View>
     );
   };
@@ -150,19 +168,32 @@ export default function PlaygroundListScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-50">
+    <SafeAreaView className="flex-1 bg-background">
       <StatusBar style="dark" />
 
       <View className="flex-1 px-4 pt-4">
         {/* Header */}
-        <View className="mb-4">
-          <Text className="text-2xl font-bold text-gray-800">
-            My Playgrounds
-          </Text>
-          <Text className="text-gray-600">
-            {sortedPlaygrounds.length}{" "}
-            {sortedPlaygrounds.length === 1 ? "playground" : "playgrounds"}
-          </Text>
+        <View className="mb-6">
+          <View className="flex-row items-center mb-2">
+            <Text className="text-4xl mr-3">🎮</Text>
+            <Text className="text-3xl font-bold text-text-primary">
+              PlayGroundPal
+            </Text>
+          </View>
+          <View className="flex-row items-center justify-between">
+            <Text className="text-text-secondary text-lg">
+              {sortedPlaygrounds.length}{" "}
+              {sortedPlaygrounds.length === 1 ? "playground" : "playgrounds"} in
+              your collection
+            </Text>
+            {sortedPlaygrounds.length > 0 && (
+              <View className="bg-gradient-to-r from-fun-lime to-fun-teal rounded-full px-3 py-1">
+                <Text className="text-white font-semibold text-sm">
+                  🎉 {sortedPlaygrounds.length}
+                </Text>
+              </View>
+            )}
+          </View>
         </View>
 
         {/* Sort and Filter Bar */}
@@ -188,10 +219,10 @@ export default function PlaygroundListScreen() {
               <RefreshControl
                 refreshing={refreshing}
                 onRefresh={handleRefresh}
-                colors={["#3498db"]}
-                tintColor="#3498db"
+                colors={["#3b82f6"]}
+                tintColor="#3b82f6"
                 title="Pull to refresh"
-                titleColor="#3498db"
+                titleColor="#3b82f6"
               />
             }
             testID="playground-list"

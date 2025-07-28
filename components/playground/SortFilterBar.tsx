@@ -9,6 +9,7 @@ interface SortFilterBarProps {
 
 /**
  * SortFilterBar component for sorting and filtering playgrounds
+ * Playful and fun design with delightful interactions
  *
  * Requirements: 7.1, 7.2, 7.3, 7.4, 7.5, 8.1, 8.2, 8.3, 8.4, 8.5
  */
@@ -22,19 +23,19 @@ export const SortFilterBar: React.FC<SortFilterBarProps> = ({ testID }) => {
     (filterBy.rating && filterBy.rating.length > 0) ||
     filterBy.hasPhotos !== undefined;
 
-  // Get sort option display text
+  // Get sort option display text with emojis
   const getSortText = (option: SortOption): string => {
     switch (option) {
       case "name":
-        return "Name";
+        return "📝 Name";
       case "rating":
-        return "Rating";
+        return "⭐ Rating";
       case "dateAdded":
-        return "Date Added";
+        return "📅 Date Added";
       case "distance":
-        return "Distance";
+        return "📍 Distance";
       default:
-        return "Sort";
+        return "🔀 Sort";
     }
   };
 
@@ -89,33 +90,46 @@ export const SortFilterBar: React.FC<SortFilterBarProps> = ({ testID }) => {
         activeOpacity={1}
         onPress={() => setSortModalVisible(false)}
       >
-        <View className="bg-white rounded-lg m-4 p-4 absolute bottom-0 left-0 right-0">
-          <Text className="text-lg font-bold mb-4">Sort By</Text>
+        <View className="bg-surface rounded-2xl m-4 p-6 absolute bottom-0 left-0 right-0 shadow-playful">
+          <View className="flex-row items-center mb-6">
+            <Text className="text-2xl mr-2">🔀</Text>
+            <Text className="text-xl font-bold text-text-primary">Sort By</Text>
+          </View>
 
           {/* Sort options */}
           {(["name", "rating", "dateAdded", "distance"] as SortOption[]).map(
             (option) => (
               <TouchableOpacity
                 key={option}
-                className={`p-3 border-b border-gray-100 flex-row justify-between items-center ${
-                  sortBy === option ? "bg-blue-50" : ""
+                className={`p-4 border-b border-gray-100 flex-row justify-between items-center rounded-xl mb-2 ${
+                  sortBy === option ? "bg-primary-100" : "active:bg-gray-50"
                 }`}
                 onPress={() => handleSortSelect(option)}
                 testID={testID ? `${testID}-sort-${option}` : `sort-${option}`}
+                activeOpacity={0.7}
               >
-                <Text className="text-base">{getSortText(option)}</Text>
-                {sortBy === option && <Text className="text-blue-500">✓</Text>}
+                <Text className="text-base font-medium text-text-primary">
+                  {getSortText(option)}
+                </Text>
+                {sortBy === option && (
+                  <View className="bg-primary-500 rounded-full w-6 h-6 items-center justify-center">
+                    <Text className="text-white text-sm">✓</Text>
+                  </View>
+                )}
               </TouchableOpacity>
             )
           )}
 
           {/* Cancel button */}
           <TouchableOpacity
-            className="mt-4 p-3 bg-gray-100 rounded-lg"
+            className="mt-6 p-4 bg-gray-100 rounded-xl active:bg-gray-200"
             onPress={() => setSortModalVisible(false)}
             testID={testID ? `${testID}-sort-cancel` : "sort-cancel"}
+            activeOpacity={0.7}
           >
-            <Text className="text-center font-medium">Cancel</Text>
+            <Text className="text-center font-semibold text-text-primary">
+              Cancel
+            </Text>
           </TouchableOpacity>
         </View>
       </TouchableOpacity>
@@ -135,18 +149,25 @@ export const SortFilterBar: React.FC<SortFilterBarProps> = ({ testID }) => {
         activeOpacity={1}
         onPress={() => setFilterModalVisible(false)}
       >
-        <View className="bg-white rounded-lg m-4 p-4 absolute bottom-0 left-0 right-0">
-          <Text className="text-lg font-bold mb-4">Filter By</Text>
+        <View className="bg-surface rounded-2xl m-4 p-6 absolute bottom-0 left-0 right-0 shadow-playful">
+          <View className="flex-row items-center mb-6">
+            <Text className="text-2xl mr-2">🔍</Text>
+            <Text className="text-xl font-bold text-text-primary">
+              Filter By
+            </Text>
+          </View>
 
           {/* Rating filter */}
-          <Text className="text-base font-medium mb-2">Rating</Text>
-          <View className="flex-row flex-wrap mb-4">
+          <Text className="text-base font-semibold text-text-primary mb-3">
+            ⭐ Rating
+          </Text>
+          <View className="flex-row flex-wrap mb-6">
             {[1, 2, 3, 4, 5].map((rating) => (
               <TouchableOpacity
                 key={`rating-${rating}`}
-                className={`mr-2 mb-2 px-3 py-2 rounded-full ${
+                className={`mr-3 mb-3 px-4 py-3 rounded-full ${
                   filterBy.rating?.includes(rating)
-                    ? "bg-blue-500"
+                    ? "bg-gradient-to-r from-fun-yellow to-fun-orange"
                     : "bg-gray-200"
                 }`}
                 onPress={() => handleRatingFilter(rating)}
@@ -155,12 +176,13 @@ export const SortFilterBar: React.FC<SortFilterBarProps> = ({ testID }) => {
                     ? `${testID}-filter-rating-${rating}`
                     : `filter-rating-${rating}`
                 }
+                activeOpacity={0.7}
               >
                 <Text
-                  className={`${
+                  className={`font-semibold ${
                     filterBy.rating?.includes(rating)
                       ? "text-white"
-                      : "text-gray-800"
+                      : "text-text-primary"
                   }`}
                 >
                   {"⭐".repeat(rating)}
@@ -170,79 +192,98 @@ export const SortFilterBar: React.FC<SortFilterBarProps> = ({ testID }) => {
           </View>
 
           {/* Photo filter */}
-          <Text className="text-base font-medium mb-2">Photos</Text>
-          <View className="flex-row mb-4">
+          <Text className="text-base font-semibold text-text-primary mb-3">
+            📸 Photos
+          </Text>
+          <View className="flex-row mb-6">
             <TouchableOpacity
-              className={`mr-2 px-3 py-2 rounded-full ${
-                filterBy.hasPhotos === true ? "bg-blue-500" : "bg-gray-200"
+              className={`mr-3 px-4 py-3 rounded-full ${
+                filterBy.hasPhotos === true
+                  ? "bg-gradient-to-r from-fun-teal to-fun-lime"
+                  : "bg-gray-200"
               }`}
               onPress={() => handlePhotoFilter(true)}
               testID={
                 testID ? `${testID}-filter-has-photos` : "filter-has-photos"
               }
+              activeOpacity={0.7}
             >
               <Text
-                className={`${
-                  filterBy.hasPhotos === true ? "text-white" : "text-gray-800"
+                className={`font-semibold ${
+                  filterBy.hasPhotos === true
+                    ? "text-white"
+                    : "text-text-primary"
                 }`}
               >
-                Has Photos
+                📸 Has Photos
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              className={`mr-2 px-3 py-2 rounded-full ${
-                filterBy.hasPhotos === false ? "bg-blue-500" : "bg-gray-200"
+              className={`mr-3 px-4 py-3 rounded-full ${
+                filterBy.hasPhotos === false
+                  ? "bg-gradient-to-r from-fun-purple to-fun-pink"
+                  : "bg-gray-200"
               }`}
               onPress={() => handlePhotoFilter(false)}
               testID={
                 testID ? `${testID}-filter-no-photos` : "filter-no-photos"
               }
+              activeOpacity={0.7}
             >
               <Text
-                className={`${
-                  filterBy.hasPhotos === false ? "text-white" : "text-gray-800"
+                className={`font-semibold ${
+                  filterBy.hasPhotos === false
+                    ? "text-white"
+                    : "text-text-primary"
                 }`}
               >
-                No Photos
+                ❌ No Photos
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              className={`px-3 py-2 rounded-full ${
-                filterBy.hasPhotos === undefined ? "bg-blue-500" : "bg-gray-200"
+              className={`px-4 py-3 rounded-full ${
+                filterBy.hasPhotos === undefined
+                  ? "bg-gradient-to-r from-primary-500 to-secondary-500"
+                  : "bg-gray-200"
               }`}
               onPress={() => handlePhotoFilter(undefined)}
               testID={
                 testID ? `${testID}-filter-any-photos` : "filter-any-photos"
               }
+              activeOpacity={0.7}
             >
               <Text
-                className={`${
+                className={`font-semibold ${
                   filterBy.hasPhotos === undefined
                     ? "text-white"
-                    : "text-gray-800"
+                    : "text-text-primary"
                 }`}
               >
-                Any
+                🌟 Any
               </Text>
             </TouchableOpacity>
           </View>
 
           {/* Action buttons */}
-          <View className="flex-row mt-4">
+          <View className="flex-row mt-6">
             <TouchableOpacity
-              className="flex-1 mr-2 p-3 bg-gray-100 rounded-lg"
+              className="flex-1 mr-3 p-4 bg-gray-100 rounded-xl active:bg-gray-200"
               onPress={() => setFilterModalVisible(false)}
               testID={testID ? `${testID}-filter-cancel` : "filter-cancel"}
+              activeOpacity={0.7}
             >
-              <Text className="text-center font-medium">Cancel</Text>
+              <Text className="text-center font-semibold text-text-primary">
+                Cancel
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              className="flex-1 ml-2 p-3 bg-blue-500 rounded-lg"
+              className="flex-1 ml-3 p-4 bg-gradient-to-r from-accent-500 to-accent-600 rounded-xl active:from-accent-600 active:to-accent-700"
               onPress={clearFilters}
               testID={testID ? `${testID}-filter-clear` : "filter-clear"}
+              activeOpacity={0.7}
             >
-              <Text className="text-center font-medium text-white">
-                Clear Filters
+              <Text className="text-center font-semibold text-white">
+                🗑️ Clear Filters
               </Text>
             </TouchableOpacity>
           </View>
@@ -253,35 +294,50 @@ export const SortFilterBar: React.FC<SortFilterBarProps> = ({ testID }) => {
 
   return (
     <View
-      className="flex-row justify-between items-center mb-4"
+      className="flex-row justify-between items-center mb-6"
       testID={testID}
     >
       {/* Sort button */}
       <TouchableOpacity
-        className="flex-row items-center bg-white px-3 py-2 rounded-lg shadow-sm"
+        className="flex-row items-center bg-surface px-4 py-3 rounded-xl shadow-card active:scale-95"
         onPress={() => setSortModalVisible(true)}
         testID={testID ? `${testID}-sort-button` : "sort-button"}
+        activeOpacity={0.8}
       >
-        <Text className="mr-1">Sort: </Text>
-        <Text className="font-medium">{getSortText(sortBy)}</Text>
+        <Text className="text-fun-teal mr-2">🔀</Text>
+        <Text className="font-semibold text-text-primary">
+          {getSortText(sortBy)}
+        </Text>
       </TouchableOpacity>
 
       {/* Filter button */}
       <TouchableOpacity
-        className={`flex-row items-center px-3 py-2 rounded-lg shadow-sm ${
-          hasActiveFilters ? "bg-blue-500" : "bg-white"
+        className={`flex-row items-center px-4 py-3 rounded-xl shadow-card active:scale-95 ${
+          hasActiveFilters
+            ? "bg-gradient-to-r from-fun-yellow to-fun-orange"
+            : "bg-surface"
         }`}
         onPress={() => setFilterModalVisible(true)}
         testID={testID ? `${testID}-filter-button` : "filter-button"}
+        activeOpacity={0.8}
       >
         <Text
-          className={`mr-1 ${hasActiveFilters ? "text-white" : "text-black"}`}
+          className={`mr-2 ${
+            hasActiveFilters ? "text-white" : "text-fun-purple"
+          }`}
+        >
+          🔍
+        </Text>
+        <Text
+          className={`font-semibold ${
+            hasActiveFilters ? "text-white" : "text-text-primary"
+          }`}
         >
           Filter
         </Text>
         {hasActiveFilters && (
-          <View className="bg-white rounded-full w-5 h-5 items-center justify-center">
-            <Text className="text-xs text-blue-500 font-bold">
+          <View className="bg-white rounded-full w-6 h-6 items-center justify-center ml-2">
+            <Text className="text-xs text-fun-orange font-bold">
               {(filterBy.rating?.length || 0) +
                 (filterBy.hasPhotos !== undefined ? 1 : 0)}
             </Text>

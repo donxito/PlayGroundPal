@@ -38,8 +38,6 @@ describe("AddPlaygroundScreen", () => {
 
     // Check header
     expect(getByText("Add New Playground")).toBeTruthy();
-    expect(
-      getByText("Fill in the details to add a new playground")
-    ).toBeTruthy();
+    expect(getByText(/Let's discover a new playground!/)).toBeTruthy();
   });
 });
