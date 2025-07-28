@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useEffect } from "react";
+import React, { useCallback, useState, useEffect, useMemo } from "react";
 import {
   View,
   Text,
@@ -13,10 +13,11 @@ import {
 } from "../../store/playgroundStore";
 import { PlaygroundCard } from "../../components/playground/PlaygroundCard";
 import { SortFilterBar } from "../../components/playground/SortFilterBar";
-import { LoadingSpinner } from "../../components/ui/LoadingSpinner";
+import { LoadingSpinner, ListSkeleton } from "../../components/ui";
 import { Playground } from "../../types/playground";
 import { useFocusEffect } from "expo-router";
 import * as Location from "expo-location";
+import { ListOptimizer, PerformanceMonitor } from "../../utils/performance";
 
 /**
  * Playground List Screen
@@ -37,12 +38,16 @@ export default function PlaygroundListScreen() {
     { latitude: number; longitude: number } | undefined
   >(undefined);
 
-  // Get sorted and filtered playgrounds
-  const sortedPlaygrounds = getSortedAndFilteredPlaygrounds(
-    playgrounds,
-    sortBy,
-    filterBy,
-    userLocation
+  // Get sorted and filtered playgrounds with memoization
+  const sortedPlaygrounds = useMemo(
+    () =>
+      getSortedAndFilteredPlaygrounds(
+        playgrounds,
+        sortBy,
+        filterBy,
+        userLocation
+      ),
+    [playgrounds, sortBy, filterBy, userLocation]
   );
 
   // Get user location for distance sorting
@@ -79,11 +84,14 @@ export default function PlaygroundListScreen() {
     }, [loadPlaygrounds])
   );
 
-  // Handle pull-to-refresh
+  // Handle pull-to-refresh with performance monitoring
   const handleRefresh = useCallback(async () => {
     setRefreshing(true);
     try {
-      await loadPlaygrounds();
+      await PerformanceMonitor.measureTime(
+        "Refresh Playgrounds",
+        loadPlaygrounds
+      );
     } finally {
       setRefreshing(false);
     }
@@ -123,13 +131,23 @@ export default function PlaygroundListScreen() {
     );
   };
 
-  // Render item for FlatList
-  const renderItem = ({ item }: { item: Playground }) => (
-    <PlaygroundCard playground={item} />
+  // Render item for FlatList with optimization
+  const renderItem = useCallback(
+    ({ item }: { item: Playground }) => <PlaygroundCard playground={item} />,
+    []
   );
 
-  // Extract key for FlatList items
-  const keyExtractor = (item: Playground) => item.id;
+  // Extract key for FlatList items with optimization
+  const keyExtractor = useCallback(
+    (item: Playground) => ListOptimizer.generateKey(item, 0),
+    []
+  );
+
+  // Render loading state with skeleton
+  const renderLoadingState = () => {
+    if (!loading) return null;
+    return <ListSkeleton count={5} testID="playground-list-skeleton" />;
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
@@ -151,30 +169,34 @@ export default function PlaygroundListScreen() {
         <SortFilterBar testID="playground-sort-filter" />
 
         {/* Playground List */}
-        <FlatList
-          data={sortedPlaygrounds}
-          renderItem={renderItem}
-          keyExtractor={keyExtractor}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{
-            flexGrow: 1,
-            paddingBottom: 20,
-          }}
-          ListEmptyComponent={
-            playgrounds.length > 0 ? renderNoResultsState : renderEmptyState
-          }
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={handleRefresh}
-              colors={["#3498db"]}
-              tintColor="#3498db"
-              title="Pull to refresh"
-              titleColor="#3498db"
-            />
-          }
-          testID="playground-list"
-        />
+        {loading ? (
+          renderLoadingState()
+        ) : (
+          <FlatList
+            data={sortedPlaygrounds}
+            renderItem={renderItem}
+            keyExtractor={keyExtractor}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{
+              flexGrow: 1,
+              paddingBottom: 20,
+            }}
+            ListEmptyComponent={
+              playgrounds.length > 0 ? renderNoResultsState : renderEmptyState
+            }
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={handleRefresh}
+                colors={["#3498db"]}
+                tintColor="#3498db"
+                title="Pull to refresh"
+                titleColor="#3498db"
+              />
+            }
+            testID="playground-list"
+          />
+        )}
       </View>
 
       {/* Loading overlay */}

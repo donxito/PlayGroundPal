@@ -10,6 +10,18 @@ export { LoadingSpinner } from "./LoadingSpinner";
 export { Modal, ConfirmModal } from "./Modal";
 export { RatingSelector } from "./RatingSelector";
 export { PhotoGallery } from "./PhotoGallery";
+export {
+  OptimizedImage,
+  ThumbnailImage,
+  FullSizeImage,
+} from "./OptimizedImage";
+export {
+  Skeleton,
+  PlaygroundCardSkeleton,
+  PhotoGallerySkeleton,
+  FormSkeleton,
+  ListSkeleton,
+} from "./Skeleton";
 
 // Re-export default exports for convenience
 export { default as ButtonDefault } from "./Button";

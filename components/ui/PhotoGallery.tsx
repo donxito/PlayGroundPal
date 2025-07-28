@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import {
   View,
   Text,
@@ -7,10 +7,11 @@ import {
   Alert,
   Dimensions,
 } from "react-native";
-import { Image } from "expo-image";
 import { Button } from "./Button";
 import { Modal } from "./Modal";
 import { LoadingSpinner } from "./LoadingSpinner";
+import { ThumbnailImage, FullSizeImage } from "./OptimizedImage";
+import { HapticFeedback, PerformanceMonitor } from "../../utils/performance";
 import {
   takePhoto,
   selectPhoto,
@@ -96,6 +97,7 @@ export const PhotoGallery: React.FC<PhotoGalleryProps> = ({
    */
   const handleTakePhoto = async () => {
     try {
+      HapticFeedback.light();
       setLoading(true);
       setError(null);
 
@@ -144,6 +146,7 @@ export const PhotoGallery: React.FC<PhotoGalleryProps> = ({
    */
   const handleSelectPhoto = async () => {
     try {
+      HapticFeedback.light();
       setLoading(true);
       setError(null);
 
@@ -192,6 +195,7 @@ export const PhotoGallery: React.FC<PhotoGalleryProps> = ({
    */
   const handleDeletePhoto = async (photoUri: string) => {
     try {
+      HapticFeedback.heavy();
       setLoading(true);
       setError(null);
 
@@ -287,13 +291,10 @@ export const PhotoGallery: React.FC<PhotoGalleryProps> = ({
                 style={{ width: thumbnailSize, height: thumbnailSize }}
                 testID={testID ? `${testID}-photo-${index}` : `photo-${index}`}
               >
-                <Image
+                <ThumbnailImage
                   source={{ uri: photo.thumbnail || photo.uri }}
                   style={{ width: thumbnailSize, height: thumbnailSize }}
-                  contentFit="cover"
                   className="rounded-lg"
-                  placeholder="📷"
-                  transition={200}
                 />
 
                 {/* Delete button overlay (only in edit mode) */}
@@ -437,11 +438,10 @@ const PhotoViewerModal: React.FC<PhotoViewerModalProps> = ({
 
         {/* Photo */}
         <View className="flex-1 items-center justify-center">
-          <Image
+          <FullSizeImage
             source={{ uri: currentPhoto.uri }}
             style={{ width: "100%", height: "100%" }}
             contentFit="contain"
-            placeholder="📷"
           />
         </View>
 

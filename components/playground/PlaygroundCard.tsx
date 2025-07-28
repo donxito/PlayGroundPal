@@ -1,12 +1,12 @@
-import React, { useState, useRef, memo } from "react";
+import React, { useState, useRef, memo, useCallback, useMemo } from "react";
 import { View, Text, TouchableOpacity, Alert, Dimensions } from "react-native";
-import { Image } from "expo-image";
 import { router } from "expo-router";
 import { Swipeable } from "react-native-gesture-handler";
-import * as Haptics from "expo-haptics";
 import { Playground } from "../../types/playground";
 import { usePlaygroundStore } from "../../store/playgroundStore";
 import { ConfirmModal } from "../ui/Modal";
+import { ThumbnailImage } from "../ui/OptimizedImage";
+import { HapticFeedback } from "../../utils/performance";
 
 interface PlaygroundCardProps {
   playground: Playground;
@@ -28,23 +28,22 @@ const PlaygroundCardComponent: React.FC<PlaygroundCardProps> = ({
   const { deletePlayground } = usePlaygroundStore();
   const swipeableRef = React.useRef<Swipeable>(null);
 
-  // Format date to display
-  const formatDate = (date: Date) => {
+  // Memoized computed values for performance
+  const formatDate = useCallback((date: Date) => {
     return new Date(date).toLocaleDateString();
-  };
+  }, []);
 
-  // Get thumbnail image if available
-  const thumbnailImage =
-    playground.photos.length > 0 ? playground.photos[0] : null;
+  const thumbnailImage = useMemo(
+    () => (playground.photos.length > 0 ? playground.photos[0] : null),
+    [playground.photos]
+  );
 
-  // Get rating emoji
-  const getRatingEmoji = (rating: number) => {
+  const getRatingEmoji = useCallback((rating: number) => {
     const emojis = ["", "⭐", "⭐⭐", "⭐⭐⭐", "⭐⭐⭐⭐", "⭐⭐⭐⭐⭐"];
     return emojis[Math.min(Math.max(Math.round(rating), 1), 5)];
-  };
+  }, []);
 
-  // Format location for display
-  const getLocationDisplay = () => {
+  const getLocationDisplay = useCallback(() => {
     if (playground.location.address) {
       return playground.location.address;
     } else if (playground.location.coordinates) {
@@ -53,23 +52,26 @@ const PlaygroundCardComponent: React.FC<PlaygroundCardProps> = ({
       )}, ${playground.location.coordinates.longitude.toFixed(4)}`;
     }
     return "No location data";
-  };
+  }, [playground.location]);
 
   // Handle card press to navigate to detail view
-  const handleCardPress = () => {
+  const handleCardPress = useCallback(() => {
+    HapticFeedback.light();
     router.push(`/playground/${playground.id}` as any);
-  };
+  }, [playground.id]);
 
   // Handle delete confirmation
-  const handleDelete = async () => {
+  const handleDelete = useCallback(async () => {
     try {
+      HapticFeedback.heavy();
       await deletePlayground(playground.id);
       // Close swipeable if still open
       swipeableRef.current?.close();
     } catch (error) {
+      HapticFeedback.error();
       Alert.alert("Error", "Failed to delete playground");
     }
-  };
+  }, [playground.id, deletePlayground]);
 
   // Render right actions for swipe gesture
   const renderRightActions = () => {
@@ -107,13 +109,10 @@ const PlaygroundCardComponent: React.FC<PlaygroundCardProps> = ({
             {/* Thumbnail */}
             <View className="mr-3">
               {thumbnailImage ? (
-                <Image
+                <ThumbnailImage
                   source={{ uri: thumbnailImage }}
                   style={{ width: imageSize, height: imageSize }}
-                  contentFit="cover"
                   className="rounded-lg"
-                  placeholder="📷"
-                  transition={200}
                   testID={testID ? `${testID}-image` : "playground-image"}
                 />
               ) : (

@@ -1,21 +1,15 @@
 import { jest } from "@jest/globals";
 import "react-native-gesture-handler/jestSetup";
 
-jest.mock("expo-constants", () => {
-  const ActualConstants = jest.requireActual("expo-constants").default;
-  return {
-    default: {
-      ...ActualConstants,
-      expoConfig: {
-        ...ActualConstants.expoConfig,
-        extra: {
-          ...ActualConstants.expoConfig?.extra,
-          storybookEnabled: process.env.STORYBOOK_ENABLED,
-        },
+jest.mock("expo-constants", () => ({
+  default: {
+    expoConfig: {
+      extra: {
+        storybookEnabled: process.env.STORYBOOK_ENABLED,
       },
     },
-  };
-});
+  },
+}));
 
 jest.mock("expo-router", () => {
   const router = jest.requireActual("expo-router");
@@ -74,7 +68,13 @@ jest.mock("react-native", () => ({
   TouchableWithoutFeedback: "TouchableWithoutFeedback",
   TextInput: "TextInput",
   Image: "Image",
-  FlatList: ({ data, renderItem, ListEmptyComponent, testID }) => {
+  FlatList: ({
+    data,
+    renderItem,
+    ListEmptyComponent,
+    testID,
+    keyExtractor,
+  }) => {
     const mockReact = require("react");
     if (!data || data.length === 0) {
       return ListEmptyComponent ? ListEmptyComponent() : null;
@@ -82,7 +82,13 @@ jest.mock("react-native", () => ({
     return mockReact.createElement(
       "View",
       { testID },
-      data.map((item, index) => renderItem({ item, index }))
+      data.map((item, index) =>
+        mockReact.createElement(
+          "View",
+          { key: keyExtractor ? keyExtractor(item, index) : index },
+          renderItem({ item, index })
+        )
+      )
     );
   },
   ActivityIndicator: "ActivityIndicator",
@@ -203,6 +209,86 @@ jest.mock("expo-haptics", () => ({
     Warning: "warning",
     Error: "error",
   },
+}));
+
+// Mock expo-camera
+jest.mock("expo-camera", () => ({
+  Camera: "Camera",
+  CameraType: {
+    front: "front",
+    back: "back",
+  },
+  FlashMode: {
+    on: "on",
+    off: "off",
+    auto: "auto",
+    torch: "torch",
+  },
+  getCameraPermissionsAsync: jest.fn().mockResolvedValue({ status: "granted" }),
+  requestCameraPermissionsAsync: jest
+    .fn()
+    .mockResolvedValue({ status: "granted" }),
+}));
+
+// Mock expo-image-picker
+jest.mock("expo-image-picker", () => ({
+  launchCameraAsync: jest.fn().mockResolvedValue({
+    canceled: false,
+    assets: [{ uri: "file://test-photo.jpg" }],
+  }),
+  launchImageLibraryAsync: jest.fn().mockResolvedValue({
+    canceled: false,
+    assets: [{ uri: "file://test-photo.jpg" }],
+  }),
+  MediaTypeOptions: {
+    Images: "Images",
+  },
+  ImagePickerResult: {
+    Canceled: "canceled",
+  },
+}));
+
+// Mock expo-image-manipulator
+jest.mock("expo-image-manipulator", () => ({
+  manipulateAsync: jest.fn().mockResolvedValue({
+    uri: "file://manipulated-photo.jpg",
+    width: 800,
+    height: 600,
+  }),
+  SaveFormat: {
+    JPEG: "jpeg",
+    PNG: "png",
+    WEBP: "webp",
+  },
+}));
+
+// Mock expo-file-system
+jest.mock("expo-file-system", () => ({
+  documentDirectory: "file://test-documents/",
+  cacheDirectory: "file://test-cache/",
+  readAsStringAsync: jest.fn().mockResolvedValue("test content"),
+  writeAsStringAsync: jest.fn().mockResolvedValue(undefined),
+  deleteAsync: jest.fn().mockResolvedValue(undefined),
+  moveAsync: jest.fn().mockResolvedValue(undefined),
+  copyAsync: jest.fn().mockResolvedValue(undefined),
+  makeDirectoryAsync: jest.fn().mockResolvedValue(undefined),
+  readDirectoryAsync: jest.fn().mockResolvedValue([]),
+  getInfoAsync: jest.fn().mockResolvedValue({
+    exists: true,
+    size: 1024,
+    isDirectory: false,
+  }),
+}));
+
+// Mock moti
+jest.mock("moti", () => ({
+  MotiView: "MotiView",
+  MotiText: "MotiText",
+  useAnimationState: jest.fn(() => ({
+    current: "initial",
+    transitionTo: jest.fn(),
+  })),
+  AnimatePresence: ({ children }) => children,
 }));
 
 // Mock react-native-gesture-handler
